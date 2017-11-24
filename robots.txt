@@ -1,2 +1,2 @@
 User-agent: *
-Sitemap: http://xpzouying.github.io/sitemap.xml
+Allow: /
