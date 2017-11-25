@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <meta charset="utf-8" />
+
+  
+  <title>DIVE INTO GOLANG: bufio.Writer</title>
+
+  
+  
+
+
+
+
+  
+  <meta name="author" content="zouying" />
+  <meta name="description" content="介绍 bufio实现了I/O的缓存，为io.Reader或io.Writer提供I/O缓存。
+为什么需要bufio？ 以write()操作为例。
+对于没有缓存的I/O操作，进行一次write()操作需要将用户空间(user space)中的数据传输到内核空间(kernel space)后，调用write()系统调用完成write操作，然后返回用户空间。
+如果每个字节(single byte)都需要重复上述过程，那么写入过程就非常低效率。
+为了解决该问题，就引入了用户空间的I/O缓存（user buffered I/O）。在用户空间中分配一块缓存区用来临时保存数据，当缓存写满后，再调用write()系统调用来写数据，从而提供效率。
+Golang中bufio实现的功能就是类似的功能。为某个io.Writer或者io.Reader提供缓存。
+bufio包中的主要类型 - type ReadWriter - type Reader - type Scanner - type Writer （本文介绍的对象）  type bufio.Writer 为io.Writer对象提供缓存。
+type Writer struct { err error buf []byte	// 缓存空间 	n int // 统计已经缓存的数据个数 	wr io.Writer // 底层的io.Writer对象 } Writer为一个结构体，定义了一块缓存，为wr对象提供缓存，err、n是当前缓存的中间状态，其中n表示当前缓存的数据个数，用来统计缓存区的缓存个数和计算剩余缓存空间大小。
+使用说明 bufio提供来2个工厂函数获得Writer
+ func NewWriter(w io.Writer) *Writer func NewWriterSize(w io.Writer, size int) *Writer  看源码，bufio/bufio.go
+func NewWriter(w io." />
+
+  
+  
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:site" content="@xpzouying" />
+    <meta name="twitter:title" content="DIVE INTO GOLANG: bufio.Writer" />
+    <meta name="twitter:description" content="介绍 bufio实现了I/O的缓存，为io.Reader或io.Writer提供I/O缓存。
+为什么需要bufio？ 以write()操作为例。
+对于没有缓存的I/O操作，进行一次write()操作需要将用户空间(user space)中的数据传输到内核空间(kernel space)后，调用write()系统调用完成write操作，然后返回用户空间。
+如果每个字节(single byte)都需要重复上述过程，那么写入过程就非常低效率。
+为了解决该问题，就引入了用户空间的I/O缓存（user buffered I/O）。在用户空间中分配一块缓存区用来临时保存数据，当缓存写满后，再调用write()系统调用来写数据，从而提供效率。
+Golang中bufio实现的功能就是类似的功能。为某个io.Writer或者io.Reader提供缓存。
+bufio包中的主要类型 - type ReadWriter - type Reader - type Scanner - type Writer （本文介绍的对象）  type bufio.Writer 为io.Writer对象提供缓存。
+type Writer struct { err error buf []byte	// 缓存空间 	n int // 统计已经缓存的数据个数 	wr io.Writer // 底层的io.Writer对象 } Writer为一个结构体，定义了一块缓存，为wr对象提供缓存，err、n是当前缓存的中间状态，其中n表示当前缓存的数据个数，用来统计缓存区的缓存个数和计算剩余缓存空间大小。
+使用说明 bufio提供来2个工厂函数获得Writer
+ func NewWriter(w io.Writer) *Writer func NewWriterSize(w io.Writer, size int) *Writer  看源码，bufio/bufio.go
+func NewWriter(w io." />
+    <meta name="twitter:image" content="https://xpzouying.github.io/img/avatar.jpg" />
+  
+
+
+
+
+<meta name="generator" content="Hugo 0.30.2" />
+
+
+<link rel="canonical" href="https://xpzouying.github.io/post/02_dive_into_golang_io_writer/" />
+<link rel="alternative" href="https://xpzouying.github.io/index.xml" title="zouying.is" type="application/atom+xml" />
+
+
+<meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="format-detection" content="telephone=no,email=no,adress=no" />
+<meta http-equiv="Cache-Control" content="no-transform" />
+
+
+<meta name="robots" content="index,follow" />
+<meta name="referrer" content="origin-when-cross-origin" />
+
+
+
+
+
+
+
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="zouying.is" />
+<meta name="msapplication-tooltip" content="zouying.is" />
+<meta name='msapplication-navbutton-color' content="#5fbf5e" />
+<meta name="msapplication-TileColor" content="#5fbf5e" />
+<meta name="msapplication-TileImage" content="/img/tile-image-windows.png" />
+<link rel="icon" href="https://xpzouying.github.io/img/favicon.ico" />
+<link rel="icon" type="image/png" sizes="16x16" href="https://xpzouying.github.io/img/favicon-16x16.png" />
+<link rel="icon" type="image/png" sizes="32x32" href="https://xpzouying.github.io/img/favicon-32x32.png" />
+<link rel="icon" sizes="192x192" href="https://xpzouying.github.io/img/touch-icon-android.png" />
+<link rel="apple-touch-icon" href="https://xpzouying.github.io/img/touch-icon-apple.png" />
+<link rel="mask-icon" href="https://xpzouying.github.io/img/safari-pinned-tab.svg" color="#5fbf5e" />
+
+
+
+<link rel="stylesheet" href="//cdn.bootcss.com/video.js/6.2.8/alt/video-js-cdn.min.css" />
+
+<link rel="stylesheet" href="https://xpzouying.github.io/css/bundle.css" />
+
+
+  
+  <!--[if lt IE 9]>
+    <script src="//cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="//cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+    <script src="//cdn.bootcss.com/video.js/6.2.8/ie8/videojs-ie8.min.js"></script>
+  <![endif]-->
+
+<!--[if lte IE 11]>
+    <script src="//cdn.bootcss.com/classlist/1.1.20170427/classList.min.js"></script>
+  <![endif]-->
+
+
+<script src="//cdn.bootcss.com/object-fit-images/3.2.3/ofi.min.js"></script>
+
+
+<script src="//cdn.bootcss.com/smooth-scroll/12.1.4/js/smooth-scroll.polyfills.min.js"></script>
+
+
+</head>
+  <body>
+    
+    <div class="suspension">
+      <a title="Go to top" class="to-top is-hide"><span class="icon icon-up"></span></a>
+      
+        
+      
+    </div>
+    
+    
+  <header class="site-header">
+  <img class="avatar" src="https://xpzouying.github.io/img/avatar.jpg" alt="Avatar">
+  
+  <h2 class="title">zouying.is</h2>
+  
+  <p class="subtitle">我们都生活在阴沟里，但仍有人仰望星空</p>
+  <button class="menu-toggle" type="button">
+    <span class="icon icon-menu"></span>
+  </button>
+  <nav class="site-menu collapsed">
+    <h2 class="offscreen">Main Menu</h2>
+    <ul class="menu-list">
+      
+      
+      
+      
+        <li class="menu-item  is-active"><a href="https://xpzouying.github.io/">首页</a></li>
+      
+        <li class="menu-item "><a href="https://xpzouying.github.io/about/">我是谁</a></li>
+      
+    </ul>
+  </nav>
+  <nav class="social-menu collapsed">
+    <h2 class="offscreen">Social Networks</h2>
+    <ul class="social-list">
+
+      
+      <li class="social-item">
+        <a href="mailto:xpzouying@gmail.com" title="Email"><span class="icon icon-email"></span></a>
+      </li>
+
+      
+      <li class="social-item">
+        <a href="//github.com/xpzouying" title="GitHub"><span class="icon icon-github"></span></a>
+      </li>
+
+      <li class="social-item">
+        <a href="//twitter.com/xpzouying" title="Twitter"><span class="icon icon-twitter"></span></a>
+      </li>
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      <li class="social-item">
+        <a href="https://xpzouying.github.io/index.xml"><span class="icon icon-rss" title="RSS"></span></a>
+      </li>
+
+    </ul>
+  </nav>
+</header>
+
+  <section class="main post-detail">
+    <header class="post-header">
+      <h1 class="post-title">DIVE INTO GOLANG: bufio.Writer</h1>
+      <p class="post-meta">@zouying · Nov 25, 2017 · 3 min read</p>
+    </header>
+    <article class="post-content">
+
+<h1 id="介绍">介绍</h1>
+
+<p><code>bufio</code>实现了I/O的缓存，为<code>io.Reader</code>或<code>io.Writer</code>提供I/O缓存。</p>
+
+<h1 id="为什么需要bufio">为什么需要bufio？</h1>
+
+<p>以<code>write()</code>操作为例。</p>
+
+<p>对于没有缓存的I/O操作，进行一次write()操作需要将用户空间(user space)中的数据传输到内核空间(kernel space)后，调用<code>write()</code>系统调用完成write操作，然后返回用户空间。</p>
+
+<p>如果每个字节(single byte)都需要重复上述过程，那么写入过程就非常低效率。</p>
+
+<p>为了解决该问题，就引入了用户空间的I/O缓存（user buffered I/O）。在用户空间中分配一块缓存区用来临时保存数据，当缓存写满后，再调用<code>write()</code>系统调用来写数据，从而提供效率。</p>
+
+<p>Golang中bufio实现的功能就是类似的功能。为某个<code>io.Writer</code>或者<code>io.Reader</code>提供缓存。</p>
+
+<h1 id="bufio包中的主要类型">bufio包中的主要类型</h1>
+
+<pre><code>- type ReadWriter
+- type Reader
+- type Scanner
+- type Writer （本文介绍的对象）
+</code></pre>
+
+<h1 id="type-bufio-writer">type bufio.Writer</h1>
+
+<p>为<code>io.Writer</code>对象提供缓存。</p>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">type</span>  <span class="nx">Writer</span>  <span class="kd">struct</span> <span class="p">{</span>
+	<span class="nx">err</span> <span class="kt">error</span>
+	<span class="nx">buf</span> <span class="p">[]</span><span class="kt">byte</span>	<span class="c1">// 缓存空间
+</span><span class="c1"></span>	<span class="nx">n</span>   <span class="kt">int</span> 	<span class="c1">// 统计已经缓存的数据个数
+</span><span class="c1"></span>	<span class="nx">wr</span>  <span class="nx">io</span><span class="p">.</span><span class="nx">Writer</span>  <span class="c1">// 底层的io.Writer对象
+</span><span class="c1"></span><span class="p">}</span></code></pre></div>
+<p><code>Writer</code>为一个结构体，定义了一块缓存，为wr对象提供缓存，err、n是当前缓存的中间状态，其中n表示当前缓存的数据个数，用来统计缓存区的缓存个数和计算剩余缓存空间大小。</p>
+
+<h1 id="使用说明">使用说明</h1>
+
+<p><code>bufio</code>提供来2个工厂函数获得<code>Writer</code></p>
+
+<ol>
+<li><a href="https://golang.org/pkg/bufio/#NewWriter">func NewWriter(w io.Writer) *Writer</a></li>
+<li><a href="https://golang.org/pkg/bufio/#NewWriterSize">func NewWriterSize(w io.Writer, size int) *Writer</a></li>
+</ol>
+
+<p>看源码，<code>bufio/bufio.go</code></p>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span>  <span class="nx">NewWriter</span><span class="p">(</span><span class="nx">w</span> <span class="nx">io</span><span class="p">.</span><span class="nx">Writer</span><span class="p">)</span> <span class="o">*</span><span class="nx">Writer</span> <span class="p">{</span>
+    <span class="k">return</span>  <span class="nx">NewWriterSize</span><span class="p">(</span><span class="nx">w</span><span class="p">,</span> <span class="nx">defaultBufSize</span><span class="p">)</span>
+<span class="p">}</span></code></pre></div>
+<p><code>NewWriter(w io.Writer)</code>为传入参数w产生一个缓存对象Writer。其内部实现也是调用了<code>NewWriterSize()</code>来产生Writer对象。其中<code>defaultBufSize</code>为默认缓存空间大小4096。</p>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">const</span> <span class="nx">defaultBufSize</span>  <span class="p">=</span>  <span class="mi">4096</span></code></pre></div>
+<p><code>NewWriterSize(w io.Writer, size int)</code>为传入参数w产生一个大小size的缓存对象Writer。如果传入的size&lt;=0，则使用默认的缓存大小4096。</p>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="k">return</span>  <span class="o">&amp;</span><span class="nx">Writer</span><span class="p">{</span><span class="nx">buf</span><span class="p">:</span> <span class="nb">make</span><span class="p">([]</span><span class="kt">byte</span><span class="p">,</span> <span class="nx">size</span><span class="p">),</span> <span class="nx">wr</span><span class="p">:</span> <span class="nx">w</span><span class="p">}</span></code></pre></div>
+<p>一次性分配size大小的缓存区，当前已经存放的缓存大小保存在n成员中，初始化为0。</p>
+
+<h2 id="重要函数">重要函数</h2>
+
+<h3 id="func-b-writer-available-int-https-golang-org-pkg-bufio-writer-available"><a href="https://golang.org/pkg/bufio/#Writer.Available">func (b *Writer) Available() int</a></h3>
+
+<p>返回buffer中还有多少bytes可用，<code>len(b.buf) - b.n</code>。</p>
+
+<h3 id="func-b-writer-buffered-int-https-golang-org-pkg-bufio-writer-buffered"><a href="https://golang.org/pkg/bufio/#Writer.Buffered">func (b *Writer) Buffered() int</a></h3>
+
+<p>返回buffer中已经使用了多少bytes，<code>b.n</code>。</p>
+
+<h3 id="func-b-writer-flush-error-https-golang-org-pkg-bufio-writer-flush"><a href="https://golang.org/pkg/bufio/#Writer.Flush">func (b *Writer) Flush() error</a></h3>
+
+<p>将缓存中的数据写入到底层io.Writer。</p>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// Flush writes any buffered data to the underlying io.Writer.
+</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">b</span> <span class="o">*</span><span class="nx">Writer</span><span class="p">)</span> <span class="nx">Flush</span><span class="p">()</span> <span class="kt">error</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="nx">b</span><span class="p">.</span><span class="nx">err</span> <span class="o">!=</span>  <span class="kc">nil</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nx">b</span><span class="p">.</span><span class="nx">err</span>
+    <span class="p">}</span>
+    <span class="k">if</span> <span class="nx">b</span><span class="p">.</span><span class="nx">n</span> <span class="o">==</span>  <span class="mi">0</span> <span class="p">{</span>
+        <span class="c1">// 如果缓存区中没有数据，直接返回
+</span><span class="c1"></span>        <span class="k">return</span>  <span class="kc">nil</span>
+    <span class="p">}</span>
+
+    <span class="c1">// 将缓存数据b.n个bytes写入下一层的io.Writer对象中
+</span><span class="c1"></span>    <span class="nx">n</span><span class="p">,</span> <span class="nx">err</span>  <span class="o">:=</span> <span class="nx">b</span><span class="p">.</span><span class="nx">wr</span><span class="p">.</span><span class="nx">Write</span><span class="p">(</span><span class="nx">b</span><span class="p">.</span><span class="nx">buf</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="nx">b</span><span class="p">.</span><span class="nx">n</span><span class="p">])</span>
+    <span class="k">if</span> <span class="nx">n</span> <span class="p">&lt;</span> <span class="nx">b</span><span class="p">.</span><span class="nx">n</span> <span class="o">&amp;&amp;</span> <span class="nx">err</span> <span class="o">==</span>  <span class="kc">nil</span> <span class="p">{</span>
+        <span class="nx">err</span>  <span class="p">=</span> <span class="nx">io</span><span class="p">.</span><span class="nx">ErrShortWrite</span>
+    <span class="p">}</span>
+
+    <span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span>  <span class="kc">nil</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="nx">n</span> <span class="p">&gt;</span> <span class="mi">0</span>  <span class="o">&amp;&amp;</span> <span class="nx">n</span> <span class="p">&lt;</span> <span class="nx">b</span><span class="p">.</span><span class="nx">n</span> <span class="p">{</span>
+            <span class="nb">copy</span><span class="p">(</span><span class="nx">b</span><span class="p">.</span><span class="nx">buf</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="nx">b</span><span class="p">.</span><span class="nx">n</span><span class="o">-</span><span class="nx">n</span><span class="p">],</span> <span class="nx">b</span><span class="p">.</span><span class="nx">buf</span><span class="p">[</span><span class="nx">n</span><span class="p">:</span><span class="nx">b</span><span class="p">.</span><span class="nx">n</span><span class="p">])</span>
+        <span class="p">}</span>
+        <span class="nx">b</span><span class="p">.</span><span class="nx">n</span> <span class="o">-=</span> <span class="nx">n</span>
+        <span class="nx">b</span><span class="p">.</span><span class="nx">err</span>  <span class="p">=</span> <span class="nx">err</span>
+        <span class="k">return</span> <span class="nx">err</span>
+    <span class="p">}</span>
+    <span class="nx">b</span><span class="p">.</span><span class="nx">n</span>  <span class="p">=</span>  <span class="mi">0</span>
+    <span class="k">return</span>  <span class="kc">nil</span>
+<span class="p">}</span></code></pre></div>
+<h3 id="func-b-writer-readfrom-r-io-reader-n-int64-err-error-https-golang-org-pkg-bufio-writer-readfrom"><a href="https://golang.org/pkg/bufio/#Writer.ReadFrom">func (b *Writer) ReadFrom(r io.Reader) (n int64, err error)</a></h3>
+
+<p>从io.Reader中读取数据。实现了io.ReaderFrom接口。</p>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="p">(</span><span class="nx">b</span> <span class="o">*</span><span class="nx">Writer</span><span class="p">)</span> <span class="nx">ReadFrom</span><span class="p">(</span><span class="nx">r</span> <span class="nx">io</span><span class="p">.</span><span class="nx">Reader</span><span class="p">)</span> <span class="p">(</span><span class="nx">n</span> <span class="kt">int64</span><span class="p">,</span> <span class="nx">err</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="nx">b</span><span class="p">.</span><span class="nx">Buffered</span><span class="p">()</span> <span class="o">==</span>  <span class="mi">0</span> <span class="p">{</span>
+        <span class="k">if</span>  <span class="nx">w</span><span class="p">,</span> <span class="nx">ok</span>  <span class="o">:=</span> <span class="nx">b</span><span class="p">.</span><span class="nx">wr</span><span class="p">.(</span><span class="nx">io</span><span class="p">.</span><span class="nx">ReaderFrom</span><span class="p">);</span> <span class="nx">ok</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="nx">w</span><span class="p">.</span><span class="nx">ReadFrom</span><span class="p">(</span><span class="nx">r</span><span class="p">)</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="kd">var</span>  <span class="nx">m</span>  <span class="kt">int</span>
+    <span class="k">for</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="nx">b</span><span class="p">.</span><span class="nx">Available</span><span class="p">()</span> <span class="o">==</span>  <span class="mi">0</span> <span class="p">{</span>
+            <span class="k">if</span>  <span class="nx">err1</span>  <span class="o">:=</span> <span class="nx">b</span><span class="p">.</span><span class="nx">Flush</span><span class="p">();</span> <span class="nx">err1</span> <span class="o">!=</span>  <span class="kc">nil</span> <span class="p">{</span>
+                <span class="k">return</span> <span class="nx">n</span><span class="p">,</span> <span class="nx">err1</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+
+        <span class="nx">nr</span>  <span class="o">:=</span>  <span class="mi">0</span>
+        <span class="c1">// maxConsecutiveEmptyReads = 100
+</span><span class="c1"></span>        <span class="k">for</span> <span class="nx">nr</span> <span class="p">&lt;</span> <span class="nx">maxConsecutiveEmptyReads</span> <span class="p">{</span>
+            <span class="nx">m</span><span class="p">,</span> <span class="nx">err</span>  <span class="p">=</span> <span class="nx">r</span><span class="p">.</span><span class="nx">Read</span><span class="p">(</span><span class="nx">b</span><span class="p">.</span><span class="nx">buf</span><span class="p">[</span><span class="nx">b</span><span class="p">.</span><span class="nx">n</span><span class="p">:])</span>
+            <span class="k">if</span> <span class="nx">m</span> <span class="o">!=</span>  <span class="mi">0</span>  <span class="o">||</span> <span class="nx">err</span> <span class="o">!=</span>  <span class="kc">nil</span> <span class="p">{</span>
+                <span class="k">break</span>
+            <span class="p">}</span>
+            <span class="nx">nr</span><span class="o">++</span>
+        <span class="p">}</span>
+
+        <span class="k">if</span> <span class="nx">nr</span> <span class="o">==</span> <span class="nx">maxConsecutiveEmptyReads</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="nx">n</span><span class="p">,</span> <span class="nx">io</span><span class="p">.</span><span class="nx">ErrNoProgress</span>
+        <span class="p">}</span>
+        <span class="nx">b</span><span class="p">.</span><span class="nx">n</span> <span class="o">+=</span> <span class="nx">m</span>
+        <span class="nx">n</span> <span class="o">+=</span>  <span class="nb">int64</span><span class="p">(</span><span class="nx">m</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span>  <span class="kc">nil</span> <span class="p">{</span>
+            <span class="k">break</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="k">if</span> <span class="nx">err</span> <span class="o">==</span> <span class="nx">io</span><span class="p">.</span><span class="nx">EOF</span> <span class="p">{</span>
+        <span class="c1">// If we filled the buffer exactly, flush preemptively.
+</span><span class="c1"></span>        <span class="k">if</span> <span class="nx">b</span><span class="p">.</span><span class="nx">Available</span><span class="p">()</span> <span class="o">==</span>  <span class="mi">0</span> <span class="p">{</span>
+            <span class="nx">err</span>  <span class="p">=</span> <span class="nx">b</span><span class="p">.</span><span class="nx">Flush</span><span class="p">()</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+            <span class="nx">err</span>  <span class="p">=</span>  <span class="kc">nil</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="nx">n</span><span class="p">,</span> <span class="nx">err</span>
+<span class="p">}</span></code></pre></div>
+<ol>
+<li>如果缓存已满，那么先将缓存的数据写入(Flush)到底层io.Writer中。</li>
+<li>尝试从函数入参r中读取数据。</li>
+</ol>
+
+<h3 id="func-b-writer-reset-w-io-writer-https-golang-org-pkg-bufio-writer-reset"><a href="https://golang.org/pkg/bufio/#Writer.Reset">func (b *Writer) Reset(w io.Writer)</a></h3>
+
+<p>重置底层中的io.Writer。会清空当前Writer中的状态，包括清空所有没有Flush的缓存数据、清除错误标示err成员。</p>
+
+<h3 id="func-b-writer-write-p-byte-nn-int-err-error-https-golang-org-pkg-bufio-writer-write"><a href="https://golang.org/pkg/bufio/#Writer.Write">func (b *Writer) Write(p [] byte) (nn int, err error)</a></h3>
+
+<p>将p写入缓存。</p>
+
+<h2 id="实例">实例</h2>
+
+<p>自定义类型<code>ZYWriter1</code>，实现<code>io.Writer</code>接口。</p>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">type</span>  <span class="nx">ZYWriter1</span>  <span class="kd">struct</span><span class="p">{}</span>
+
+<span class="kd">func</span> <span class="p">(</span><span class="nx">ZYWriter1</span><span class="p">)</span> <span class="nx">Write</span><span class="p">(</span><span class="nx">p</span> <span class="p">[]</span><span class="kt">byte</span><span class="p">)</span> <span class="p">(</span><span class="nx">n</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">err</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">fmt</span><span class="p">.</span><span class="nx">Printf</span><span class="p">(</span><span class="s">&#34;ZYWriter1 write %d byte\n&#34;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="nx">p</span><span class="p">))</span>
+    <span class="k">return</span>  <span class="nb">len</span><span class="p">(</span><span class="nx">p</span><span class="p">),</span> <span class="kc">nil</span>
+
+<span class="p">}</span></code></pre></div>
+<p><strong>无缓存I/O</strong></p>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go">    <span class="nx">w1</span>  <span class="o">:=</span> <span class="nx">ZYWriter1</span><span class="p">{}</span>
+    <span class="nx">w1</span><span class="p">.</span><span class="nx">Write</span><span class="p">([]</span><span class="kt">byte</span><span class="p">{</span><span class="sc">&#39;z&#39;</span><span class="p">})</span>
+    <span class="nx">w1</span><span class="p">.</span><span class="nx">Write</span><span class="p">([]</span><span class="kt">byte</span><span class="p">{</span><span class="sc">&#39;o&#39;</span><span class="p">})</span>
+    <span class="nx">w1</span><span class="p">.</span><span class="nx">Write</span><span class="p">([]</span><span class="kt">byte</span><span class="p">{</span><span class="sc">&#39;u&#39;</span><span class="p">})</span>
+
+<span class="c1">// 输出
+</span><span class="c1">// ZYWriter1 write 1 byte: &#34;z&#34;
+</span><span class="c1">// ZYWriter1 write 1 byte: &#34;o&#34;
+</span><span class="c1"></span><span class="o">//</span> <span class="nx">ZYWriter1</span> <span class="nx">write</span> <span class="mi">1</span> <span class="kt">byte</span><span class="p">:</span> <span class="s">&#34;u&#34;</span></code></pre></div>
+<p>在无缓存的情况下，对于每一次写入，都会直接写入到实际io.Writer中。</p>
+
+<p>有缓存I/O：</p>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go">    <span class="nx">w2</span>  <span class="o">:=</span>  <span class="nb">new</span><span class="p">(</span><span class="nx">ZYWriter1</span><span class="p">)</span>
+    <span class="nx">bw</span>  <span class="o">:=</span> <span class="nx">bufio</span><span class="p">.</span><span class="nx">NewWriterSize</span><span class="p">(</span><span class="nx">w2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="nx">bw</span><span class="p">.</span><span class="nx">Write</span><span class="p">([]</span><span class="kt">byte</span><span class="p">{</span><span class="sc">&#39;z&#39;</span><span class="p">})</span>
+    <span class="nx">bw</span><span class="p">.</span><span class="nx">Write</span><span class="p">([]</span><span class="kt">byte</span><span class="p">{</span><span class="sc">&#39;o&#39;</span><span class="p">})</span>
+    <span class="nx">bw</span><span class="p">.</span><span class="nx">Write</span><span class="p">([]</span><span class="kt">byte</span><span class="p">{</span><span class="sc">&#39;u&#39;</span><span class="p">})</span>
+
+<span class="c1">// 输出
+</span><span class="c1"></span><span class="o">//</span> <span class="nx">ZYWriter1</span> <span class="nx">write</span> <span class="mi">2</span> <span class="kt">byte</span><span class="p">:</span> <span class="s">&#34;zo&#34;</span></code></pre></div>
+<p>在有缓存的情况下，该例中，定义了长度为2的缓存Writer bw。
+对于每一次的写入，都会先写入到缓存区，当缓存区写满，会Flush到底层的实际的io.Writer中。
+所以在输出中，只有当写满2 bytes字节时，才会真正地输出，调用<code>io.Writer</code>的Write()。</p>
+
+<h1 id="参考">参考</h1>
+
+<ul>
+<li><a href="https://golang.org/pkg/bufio/">https://golang.org/pkg/bufio/</a></li>
+<li><a href="https://www.quora.com/In-C-what-does-buffering-I-O-or-buffered-I-O-mean/answer/Robert-Love-1">In C, what does buffering I/O or buffered I/O mean? @quora, by Robert Love</a></li>
+</ul>
+</article>
+    <footer class="post-footer">
+      
+      <ul class="post-tags">
+        
+          <li><a href="https://xpzouying.github.io/tags/golang"><span class="tag">Golang</span></a></li>
+        
+      </ul>
+      
+      <p class="post-copyright">
+        © This post is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License，please give source if you likes to quote or reproduce.
+      </p>
+    </footer>
+    
+      
+    
+  </section>
+  <footer class="site-footer">
+  <p>© 2017 zouying.is</p>
+  <p>Powered by <a href="https://gohugo.io/" target="_blank">Hugo</a> with theme <a href="https://github.com/laozhu/hugo-nuo" target="_blank">Nuo</a>.</p>
+  
+</footer>
+
+
+
+<script async src="//cdn.bootcss.com/video.js/6.2.8/alt/video.novtt.min.js"></script>
+<script async src="//cdn.bootcss.com/mathjax/2.7.2/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [['$','$'], ['\\(','\\)']],
+      displayMath: [['$$','$$'], ['\[','\]']],
+      processEscapes: true,
+      processEnvironments: true,
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+      TeX: { equationNumbers: { autoNumber: "AMS" },
+      extensions: ["AMSmath.js", "AMSsymbols.js"] }
+    }
+  });
+</script>
+<script type="text/x-mathjax-config">
+  // Fix <code> tags after MathJax finishes running. This is a
+  // hack to overcome a shortcoming of Markdown. Discussion at
+  // https://github.com/mojombo/jekyll/issues/199
+  MathJax.Hub.Queue(() => {
+    MathJax.Hub.getAllJax().map(v => v.SourceElement().parentNode.className += ' has-jax');
+  });
+</script>
+
+<script src="https://xpzouying.github.io/js/bundle.js"></script>
+
+
+
+
+  </body>
+</html>

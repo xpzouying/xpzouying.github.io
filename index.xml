@@ -24,6 +24,25 @@
     </item>
     
     <item>
+      <title>DIVE INTO GOLANG: bufio.Writer</title>
+      <link>https://xpzouying.github.io/post/02_dive_into_golang_io_writer/</link>
+      <pubDate>Sat, 25 Nov 2017 18:26:05 +0800</pubDate>
+      
+      <guid>https://xpzouying.github.io/post/02_dive_into_golang_io_writer/</guid>
+      <description>介绍 bufio实现了I/O的缓存，为io.Reader或io.Writer提供I/O缓存。
+为什么需要bufio？ 以write()操作为例。
+对于没有缓存的I/O操作，进行一次write()操作需要将用户空间(user space)中的数据传输到内核空间(kernel space)后，调用write()系统调用完成write操作，然后返回用户空间。
+如果每个字节(single byte)都需要重复上述过程，那么写入过程就非常低效率。
+为了解决该问题，就引入了用户空间的I/O缓存（user buffered I/O）。在用户空间中分配一块缓存区用来临时保存数据，当缓存写满后，再调用write()系统调用来写数据，从而提供效率。
+Golang中bufio实现的功能就是类似的功能。为某个io.Writer或者io.Reader提供缓存。
+bufio包中的主要类型 - type ReadWriter - type Reader - type Scanner - type Writer （本文介绍的对象）  type bufio.Writer 为io.Writer对象提供缓存。
+type Writer struct { err error buf []byte	// 缓存空间 	n int // 统计已经缓存的数据个数 	wr io.Writer // 底层的io.Writer对象 } Writer为一个结构体，定义了一块缓存，为wr对象提供缓存，err、n是当前缓存的中间状态，其中n表示当前缓存的数据个数，用来统计缓存区的缓存个数和计算剩余缓存空间大小。
+使用说明 bufio提供来2个工厂函数获得Writer
+ func NewWriter(w io.Writer) *Writer func NewWriterSize(w io.Writer, size int) *Writer  看源码，bufio/bufio.go
+func NewWriter(w io.</description>
+    </item>
+    
+    <item>
       <title>Setup</title>
       <link>https://xpzouying.github.io/post/my-first-post/</link>
       <pubDate>Fri, 24 Nov 2017 12:38:56 +0800</pubDate>
