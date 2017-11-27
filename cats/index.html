@@ -18,16 +18,14 @@
 
   
   <meta name="author" content="zouying" />
-  <meta name="description" content="" />
+  <meta name="description" content="Hugo is one of the most popular open-source static site generators. With its amazing speed and flexibility, Hugo makes building websites fun again." />
 
   
-  
-    <meta name="twitter:card" content="summary" />
-    <meta name="twitter:site" content="@xpzouying" />
-    <meta name="twitter:title" content="Posts" />
-    <meta name="twitter:description" content="" />
-    <meta name="twitter:image" content="https://xpzouying.github.io/img/avatar.jpg" />
-  
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:site" content="@xpzouying" />
+  <meta name="twitter:title" content="zouying.is" />
+  <meta name="twitter:description" content="Hugo is one of the most popular open-source static site generators. With its amazing speed and flexibility, Hugo makes building websites fun again." />
+  <meta name="twitter:image" content="https://xpzouying.github.io/img/avatar.jpg" />
 
 
 
@@ -35,7 +33,7 @@
 <meta name="generator" content="Hugo 0.30.2" />
 
 
-<link rel="canonical" href="https://xpzouying.github.io/post/" />
+<link rel="canonical" href="https://xpzouying.github.io/cats/" />
 <link rel="alternative" href="https://xpzouying.github.io/index.xml" title="zouying.is" type="application/atom+xml" />
 
 
@@ -118,7 +116,7 @@
       
       
       
-        <li class="menu-item  is-active"><a href="https://xpzouying.github.io/">首页</a></li>
+        <li class="menu-item "><a href="https://xpzouying.github.io/">首页</a></li>
       
         <li class="menu-item "><a href="https://xpzouying.github.io/cats/cats/">猫之家</a></li>
       
@@ -194,43 +192,8 @@
     </header>
     
     
-      
-        <article class="post-entry">
-  <header class="post-header">
-    <h3 class="post-title"><a href="https://xpzouying.github.io/post/02_dive_into_golang_io_writer/" class="post-link">DIVE INTO GOLANG: bufio.Writer</a></h3>
-    <p class="post-meta">@zouying · Nov 25, 2017 · 3 min read</p>
-  </header>
-  
-  <p class="post-summary">介绍 bufio实现了I/O的缓存，为io.Reader或io.Writer提供I/O缓存。
-为什么需要bufio？ 以write()操作为例。
-对于没有缓存的I/O操作，进行一次write()操作需要将用户空间(user space)中的数据传输到内核空间(kernel space)后，调用write()系统调用完成write操作，然后返回用户空间。
-如果每个字节(single byte)都需要重复上述过程，那么写入过程就非常低效率。
-为了解决该问题，就引入了用户空间的I/O缓存（user buffered I/O）。在用户空间中分配一块缓存区用来临时保存数据，当缓存写满后，再调用write()系统调用来写数据，从而提供效率。
-Golang中bufio实现的功能就是类似的功能。为某个io.Writer或者io.Reader提供缓存。
-bufio包中的主要类型 - type ReadWriter - type Reader - type Scanner - type Writer （本文介绍的对象）  type bufio.Writer 为io.Writer对象提供缓存。
-type Writer struct { err error buf []byte	// 缓存空间 	n int // 统计已经缓存的数据个数 	wr io.Writer // 底层的io.Writer对象 } Writer为一个结构体，定义了一块缓存，为wr对象提供缓存，err、n是当前缓存的中间状态，其中n表示当前缓存的数据个数，用来统计缓存区的缓存个数和计算剩余缓存空间大小。
-使用说明 bufio提供来2个工厂函数获得Writer
- func NewWriter(w io.Writer) *Writer func NewWriterSize(w io.Writer, size int) *Writer  看源码，bufio/bufio.go
-func NewWriter(w io.</p>
-  <footer class="post-footer">
-    <a class="read-more" href="https://xpzouying.github.io/post/02_dive_into_golang_io_writer/">Read More →</a>
-  </footer>
-</article>
-
-      
-        <article class="post-entry">
-  <header class="post-header">
-    <h3 class="post-title"><a href="https://xpzouying.github.io/post/my-first-post/" class="post-link">Setup</a></h3>
-    <p class="post-meta">@zouying · Nov 24, 2017 · 1 min read</p>
-  </header>
-  
-  <p class="post-summary">这里什么都还没有。</p>
-  <footer class="post-footer">
-    <a class="read-more" href="https://xpzouying.github.io/post/my-first-post/">Read More →</a>
-  </footer>
-</article>
-
-      
+      <p>There's nothing here.<br>Create an interesting post with the command:</p>
+      <p><code>$ hugo new post/hello-world.md</code></p>
     
     
   </section>
