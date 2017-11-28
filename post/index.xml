@@ -7,15 +7,29 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
     <copyright>© This post is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License，please give source if you likes to quote or reproduce.</copyright>
-    <lastBuildDate>Sat, 25 Nov 2017 18:26:05 +0800</lastBuildDate>
+    <lastBuildDate>Tue, 28 Nov 2017 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://xpzouying.github.io/post/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
+      <title>TCP网络编程分析：C语言篇</title>
+      <link>https://xpzouying.github.io/post/03_c_tcp_program/</link>
+      <pubDate>Tue, 28 Nov 2017 00:00:00 +0000</pubDate>
+      
+      <guid>https://xpzouying.github.io/post/03_c_tcp_program/</guid>
+      <description>TCP网络编程分析：C语言篇 参考《Unix Network Programming, Volume 1: The Sockets Networking API (3rd Edition)》
+网络模型
+client端 主要功能：
+client通过tcp访问server，获得服务器时间。
+主要代码如下：
+int main(int argc, char **argv) { int	sockfd, n; char	recvline[MAXLINE + 1]; struct sockaddr_in	servaddr; if (argc != 2) err_quit(&amp;#34;usage: a.out &amp;lt;IPaddress&amp;gt;&amp;#34;); if ( (sockfd = socket(AF_INET, SOCK_STREAM, 0)) &amp;lt; 0) err_sys(&amp;#34;socket error&amp;#34;); bzero(&amp;amp;servaddr, sizeof(servaddr)); servaddr.sin_family = AF_INET; servaddr.sin_port = htons(13);	/* daytime server */ if (inet_pton(AF_INET, argv[1], &amp;amp;servaddr.sin_addr) &amp;lt;= 0) err_quit(&amp;#34;inet_pton error for %s&amp;#34;, argv[1]); if (connect(sockfd, (SA *) &amp;amp;servaddr, sizeof(servaddr)) &amp;lt; 0) err_sys(&amp;#34;connect error&amp;#34;); while ( (n = read(sockfd, recvline, MAXLINE)) &amp;gt; 0) { recvline[n] = 0;	/* null terminate */ if (fputs(recvline, stdout) == EOF) err_sys(&amp;#34;fputs error&amp;#34;); } if (n &amp;lt; 0) err_sys(&amp;#34;read error&amp;#34;); exit(0); } 代码解析：</description>
+    </item>
+    
+    <item>
       <title>DIVE INTO GOLANG: bufio.Writer</title>
       <link>https://xpzouying.github.io/post/02_dive_into_golang_io_writer/</link>
-      <pubDate>Sat, 25 Nov 2017 18:26:05 +0800</pubDate>
+      <pubDate>Sat, 25 Nov 2017 00:00:00 +0000</pubDate>
       
       <guid>https://xpzouying.github.io/post/02_dive_into_golang_io_writer/</guid>
       <description>介绍 bufio实现了I/O的缓存，为io.Reader或io.Writer提供I/O缓存。
@@ -34,7 +48,7 @@ func NewWriter(w io.</description>
     <item>
       <title>Setup</title>
       <link>https://xpzouying.github.io/post/my-first-post/</link>
-      <pubDate>Fri, 24 Nov 2017 12:38:56 +0800</pubDate>
+      <pubDate>Fri, 24 Nov 2017 00:00:00 +0000</pubDate>
       
       <guid>https://xpzouying.github.io/post/my-first-post/</guid>
       <description>这里什么都还没有。</description>

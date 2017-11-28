@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <meta charset="utf-8" />
+
+  
+  <title>TCP网络编程分析：C语言篇</title>
+
+  
+  
+
+
+
+
+  
+  <meta name="author" content="zouying" />
+  <meta name="description" content="TCP网络编程分析：C语言篇 参考《Unix Network Programming, Volume 1: The Sockets Networking API (3rd Edition)》
+网络模型
+client端 主要功能：
+client通过tcp访问server，获得服务器时间。
+主要代码如下：
+int main(int argc, char **argv) { int	sockfd, n; char	recvline[MAXLINE &#43; 1]; struct sockaddr_in	servaddr; if (argc != 2) err_quit(&amp;#34;usage: a.out &amp;lt;IPaddress&amp;gt;&amp;#34;); if ( (sockfd = socket(AF_INET, SOCK_STREAM, 0)) &amp;lt; 0) err_sys(&amp;#34;socket error&amp;#34;); bzero(&amp;amp;servaddr, sizeof(servaddr)); servaddr.sin_family = AF_INET; servaddr.sin_port = htons(13);	/* daytime server */ if (inet_pton(AF_INET, argv[1], &amp;amp;servaddr.sin_addr) &amp;lt;= 0) err_quit(&amp;#34;inet_pton error for %s&amp;#34;, argv[1]); if (connect(sockfd, (SA *) &amp;amp;servaddr, sizeof(servaddr)) &amp;lt; 0) err_sys(&amp;#34;connect error&amp;#34;); while ( (n = read(sockfd, recvline, MAXLINE)) &amp;gt; 0) { recvline[n] = 0;	/* null terminate */ if (fputs(recvline, stdout) == EOF) err_sys(&amp;#34;fputs error&amp;#34;); } if (n &amp;lt; 0) err_sys(&amp;#34;read error&amp;#34;); exit(0); } 代码解析：" />
+
+  
+  
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:site" content="@xpzouying" />
+    <meta name="twitter:title" content="TCP网络编程分析：C语言篇" />
+    <meta name="twitter:description" content="TCP网络编程分析：C语言篇 参考《Unix Network Programming, Volume 1: The Sockets Networking API (3rd Edition)》
+网络模型
+client端 主要功能：
+client通过tcp访问server，获得服务器时间。
+主要代码如下：
+int main(int argc, char **argv) { int	sockfd, n; char	recvline[MAXLINE &#43; 1]; struct sockaddr_in	servaddr; if (argc != 2) err_quit(&amp;#34;usage: a.out &amp;lt;IPaddress&amp;gt;&amp;#34;); if ( (sockfd = socket(AF_INET, SOCK_STREAM, 0)) &amp;lt; 0) err_sys(&amp;#34;socket error&amp;#34;); bzero(&amp;amp;servaddr, sizeof(servaddr)); servaddr.sin_family = AF_INET; servaddr.sin_port = htons(13);	/* daytime server */ if (inet_pton(AF_INET, argv[1], &amp;amp;servaddr.sin_addr) &amp;lt;= 0) err_quit(&amp;#34;inet_pton error for %s&amp;#34;, argv[1]); if (connect(sockfd, (SA *) &amp;amp;servaddr, sizeof(servaddr)) &amp;lt; 0) err_sys(&amp;#34;connect error&amp;#34;); while ( (n = read(sockfd, recvline, MAXLINE)) &amp;gt; 0) { recvline[n] = 0;	/* null terminate */ if (fputs(recvline, stdout) == EOF) err_sys(&amp;#34;fputs error&amp;#34;); } if (n &amp;lt; 0) err_sys(&amp;#34;read error&amp;#34;); exit(0); } 代码解析：" />
+    <meta name="twitter:image" content="https://xpzouying.github.io/img/avatar.jpg" />
+  
+
+
+
+
+<meta name="generator" content="Hugo 0.30.2" />
+
+
+<link rel="canonical" href="https://xpzouying.github.io/post/03_c_tcp_program/" />
+<link rel="alternative" href="https://xpzouying.github.io/index.xml" title="zouying.is" type="application/atom+xml" />
+
+
+<meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="format-detection" content="telephone=no,email=no,adress=no" />
+<meta http-equiv="Cache-Control" content="no-transform" />
+
+
+<meta name="robots" content="index,follow" />
+<meta name="referrer" content="origin-when-cross-origin" />
+
+
+
+
+
+
+
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="zouying.is" />
+<meta name="msapplication-tooltip" content="zouying.is" />
+<meta name='msapplication-navbutton-color' content="#5fbf5e" />
+<meta name="msapplication-TileColor" content="#5fbf5e" />
+<meta name="msapplication-TileImage" content="/img/tile-image-windows.png" />
+<link rel="icon" href="https://xpzouying.github.io/img/favicon.ico" />
+<link rel="icon" type="image/png" sizes="16x16" href="https://xpzouying.github.io/img/favicon-16x16.png" />
+<link rel="icon" type="image/png" sizes="32x32" href="https://xpzouying.github.io/img/favicon-32x32.png" />
+<link rel="icon" sizes="192x192" href="https://xpzouying.github.io/img/touch-icon-android.png" />
+<link rel="apple-touch-icon" href="https://xpzouying.github.io/img/touch-icon-apple.png" />
+<link rel="mask-icon" href="https://xpzouying.github.io/img/safari-pinned-tab.svg" color="#5fbf5e" />
+
+
+
+<link rel="stylesheet" href="//cdn.bootcss.com/video.js/6.2.8/alt/video-js-cdn.min.css" />
+
+<link rel="stylesheet" href="https://xpzouying.github.io/css/bundle.css" />
+
+
+  
+  <!--[if lt IE 9]>
+    <script src="//cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="//cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+    <script src="//cdn.bootcss.com/video.js/6.2.8/ie8/videojs-ie8.min.js"></script>
+  <![endif]-->
+
+<!--[if lte IE 11]>
+    <script src="//cdn.bootcss.com/classlist/1.1.20170427/classList.min.js"></script>
+  <![endif]-->
+
+
+<script src="//cdn.bootcss.com/object-fit-images/3.2.3/ofi.min.js"></script>
+
+
+<script src="//cdn.bootcss.com/smooth-scroll/12.1.4/js/smooth-scroll.polyfills.min.js"></script>
+
+
+</head>
+  <body>
+    
+    <div class="suspension">
+      <a title="Go to top" class="to-top is-hide"><span class="icon icon-up"></span></a>
+      
+        
+      
+    </div>
+    
+    
+  <header class="site-header">
+  <img class="avatar" src="https://xpzouying.github.io/img/avatar.jpg" alt="Avatar">
+  
+  <h2 class="title">zouying.is</h2>
+  
+  <p class="subtitle">我们都生活在阴沟里，但仍有人仰望星空</p>
+  <button class="menu-toggle" type="button">
+    <span class="icon icon-menu"></span>
+  </button>
+  <nav class="site-menu collapsed">
+    <h2 class="offscreen">Main Menu</h2>
+    <ul class="menu-list">
+      
+      
+      
+      
+        <li class="menu-item  is-active"><a href="https://xpzouying.github.io/">首页</a></li>
+      
+        <li class="menu-item "><a href="https://xpzouying.github.io/cats/cats/">猫之家</a></li>
+      
+        <li class="menu-item "><a href="https://xpzouying.github.io/about/">我是谁</a></li>
+      
+    </ul>
+  </nav>
+  <nav class="social-menu collapsed">
+    <h2 class="offscreen">Social Networks</h2>
+    <ul class="social-list">
+
+      
+      <li class="social-item">
+        <a href="mailto:xpzouying@gmail.com" title="Email"><span class="icon icon-email"></span></a>
+      </li>
+
+      
+      <li class="social-item">
+        <a href="//github.com/xpzouying" title="GitHub"><span class="icon icon-github"></span></a>
+      </li>
+
+      <li class="social-item">
+        <a href="//twitter.com/xpzouying" title="Twitter"><span class="icon icon-twitter"></span></a>
+      </li>
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      <li class="social-item">
+        <a href="https://xpzouying.github.io/index.xml"><span class="icon icon-rss" title="RSS"></span></a>
+      </li>
+
+    </ul>
+  </nav>
+</header>
+
+  <section class="main post-detail">
+    <header class="post-header">
+      <h1 class="post-title">TCP网络编程分析：C语言篇</h1>
+      <p class="post-meta">@zouying · Nov 28, 2017 · 2 min read</p>
+    </header>
+    <article class="post-content">
+
+<h1 id="tcp网络编程分析-c语言篇">TCP网络编程分析：C语言篇</h1>
+
+<p>参考《Unix Network Programming, Volume 1: The Sockets Networking API (3rd Edition)》</p>
+
+<p>网络模型</p>
+
+<p><img src="http://cdncontribute.geeksforgeeks.org/wp-content/uploads/Socket-Programming-in-C-C--300x300.jpg" alt="TCP Server/Client" /></p>
+
+<h3 id="client端">client端</h3>
+
+<p><strong>主要功能：</strong></p>
+
+<p>client通过tcp访问server，获得服务器时间。</p>
+
+<p>主要代码如下：</p>
+<div class="highlight"><pre class="chroma"><code class="language-c++" data-lang="c++"><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">**</span><span class="n">argv</span><span class="p">)</span>
+<span class="p">{</span>
+	<span class="kt">int</span>					<span class="n">sockfd</span><span class="p">,</span> <span class="n">n</span><span class="p">;</span>
+	<span class="kt">char</span>				<span class="n">recvline</span><span class="p">[</span><span class="n">MAXLINE</span> <span class="o">+</span> <span class="mi">1</span><span class="p">];</span>
+	<span class="k">struct</span> <span class="n">sockaddr_in</span>	<span class="n">servaddr</span><span class="p">;</span>
+
+	<span class="k">if</span> <span class="p">(</span><span class="n">argc</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">)</span>
+		<span class="n">err_quit</span><span class="p">(</span><span class="sa"></span><span class="s">&#34;usage: a.out &lt;IPaddress&gt;&#34;</span><span class="p">);</span>
+
+	<span class="k">if</span> <span class="p">(</span> <span class="p">(</span><span class="n">sockfd</span> <span class="o">=</span> <span class="n">socket</span><span class="p">(</span><span class="n">AF_INET</span><span class="p">,</span> <span class="n">SOCK_STREAM</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span>
+		<span class="n">err_sys</span><span class="p">(</span><span class="sa"></span><span class="s">&#34;socket error&#34;</span><span class="p">);</span>
+
+	<span class="n">bzero</span><span class="p">(</span><span class="o">&amp;</span><span class="n">servaddr</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">servaddr</span><span class="p">));</span>
+	<span class="n">servaddr</span><span class="p">.</span><span class="n">sin_family</span> <span class="o">=</span> <span class="n">AF_INET</span><span class="p">;</span>
+	<span class="n">servaddr</span><span class="p">.</span><span class="n">sin_port</span>   <span class="o">=</span> <span class="n">htons</span><span class="p">(</span><span class="mi">13</span><span class="p">);</span>	<span class="cm">/* daytime server */</span>
+	<span class="k">if</span> <span class="p">(</span><span class="n">inet_pton</span><span class="p">(</span><span class="n">AF_INET</span><span class="p">,</span> <span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="o">&amp;</span><span class="n">servaddr</span><span class="p">.</span><span class="n">sin_addr</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">)</span>
+		<span class="n">err_quit</span><span class="p">(</span><span class="sa"></span><span class="s">&#34;inet_pton error for %s&#34;</span><span class="p">,</span> <span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
+
+	<span class="k">if</span> <span class="p">(</span><span class="n">connect</span><span class="p">(</span><span class="n">sockfd</span><span class="p">,</span> <span class="p">(</span><span class="n">SA</span> <span class="o">*</span><span class="p">)</span> <span class="o">&amp;</span><span class="n">servaddr</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">servaddr</span><span class="p">))</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span>
+		<span class="n">err_sys</span><span class="p">(</span><span class="sa"></span><span class="s">&#34;connect error&#34;</span><span class="p">);</span>
+
+	<span class="k">while</span> <span class="p">(</span> <span class="p">(</span><span class="n">n</span> <span class="o">=</span> <span class="n">read</span><span class="p">(</span><span class="n">sockfd</span><span class="p">,</span> <span class="n">recvline</span><span class="p">,</span> <span class="n">MAXLINE</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+		<span class="n">recvline</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>	<span class="cm">/* null terminate */</span>
+		<span class="k">if</span> <span class="p">(</span><span class="n">fputs</span><span class="p">(</span><span class="n">recvline</span><span class="p">,</span> <span class="n">stdout</span><span class="p">)</span> <span class="o">==</span> <span class="n">EOF</span><span class="p">)</span>
+			<span class="n">err_sys</span><span class="p">(</span><span class="sa"></span><span class="s">&#34;fputs error&#34;</span><span class="p">);</span>
+	<span class="p">}</span>
+	<span class="k">if</span> <span class="p">(</span><span class="n">n</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span>
+		<span class="n">err_sys</span><span class="p">(</span><span class="sa"></span><span class="s">&#34;read error&#34;</span><span class="p">);</span>
+
+	<span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+<span class="p">}</span></code></pre></div>
+<p><strong>代码解析：</strong></p>
+
+<ol>
+<li><code>sockfd = socket(AF_INET, SOCK_STREAM, 0)</code> 获得一个socket descriptor，类似于一个file-handle。传入参数：第1个AF_INET表示IPv4协议，如果AF_INET6则表示IPv6协议。第2个参数表示传输类型：SOCK_STREAM表示TCP，SOCK_DGRAM表示UDP。第3个配置IP协议value，一般为0。</li>
+<li><code>inet_pton(AF_INET, argv[1], &amp;servaddr.sin_addr)</code> 是一个IP地址转换成packed address函数。第1个参数是指协议类型，AF_INET或者IF_INET6；第2个参数是地址的字符串形式，比如&rdquo;192.168.1.100&rdquo;，第3个参数是将第2个参数转换成的packed address保存。</li>
+<li><code>connect(sockfd, (SA *) &amp;servaddr, sizeof(servaddr))</code> 通过第一步中创建的socket descriptor建立socket链接。</li>
+<li><code>read(sockfd, recvline, MAXLINE)</code> 从已经打开的sockfd读取数据。</li>
+<li><code>fputs(recvline, stdout)</code> 将字符串写到stdout中。</li>
+</ol>
+
+<h3 id="server端">server端</h3>
+
+<p><strong>主要功能</strong></p>
+
+<p>server监听一个socket地址，收到client的请求后，将当前时间返回给client。</p>
+<div class="highlight"><pre class="chroma"><code class="language-c++" data-lang="c++"><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">**</span><span class="n">argv</span><span class="p">)</span>
+<span class="p">{</span>
+	<span class="kt">int</span>					<span class="n">listenfd</span><span class="p">,</span> <span class="n">connfd</span><span class="p">;</span>
+	<span class="k">struct</span> <span class="n">sockaddr_in</span>	<span class="n">servaddr</span><span class="p">;</span>
+	<span class="kt">char</span>				<span class="n">buff</span><span class="p">[</span><span class="n">MAXLINE</span><span class="p">];</span>
+	<span class="n">time_t</span>				<span class="n">ticks</span><span class="p">;</span>
+
+	<span class="n">listenfd</span> <span class="o">=</span> <span class="n">Socket</span><span class="p">(</span><span class="n">AF_INET</span><span class="p">,</span> <span class="n">SOCK_STREAM</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+
+	<span class="n">bzero</span><span class="p">(</span><span class="o">&amp;</span><span class="n">servaddr</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">servaddr</span><span class="p">));</span>
+	<span class="n">servaddr</span><span class="p">.</span><span class="n">sin_family</span>      <span class="o">=</span> <span class="n">AF_INET</span><span class="p">;</span>
+	<span class="n">servaddr</span><span class="p">.</span><span class="n">sin_addr</span><span class="p">.</span><span class="n">s_addr</span> <span class="o">=</span> <span class="n">htonl</span><span class="p">(</span><span class="n">INADDR_ANY</span><span class="p">);</span>
+	<span class="n">servaddr</span><span class="p">.</span><span class="n">sin_port</span>        <span class="o">=</span> <span class="n">htons</span><span class="p">(</span><span class="mi">13</span><span class="p">);</span>	<span class="cm">/* daytime server */</span>
+
+	<span class="n">Bind</span><span class="p">(</span><span class="n">listenfd</span><span class="p">,</span> <span class="p">(</span><span class="n">SA</span> <span class="o">*</span><span class="p">)</span> <span class="o">&amp;</span><span class="n">servaddr</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">servaddr</span><span class="p">));</span>
+
+	<span class="n">Listen</span><span class="p">(</span><span class="n">listenfd</span><span class="p">,</span> <span class="n">LISTENQ</span><span class="p">);</span>
+
+	<span class="k">for</span> <span class="p">(</span> <span class="p">;</span> <span class="p">;</span> <span class="p">)</span> <span class="p">{</span>
+		<span class="n">connfd</span> <span class="o">=</span> <span class="n">Accept</span><span class="p">(</span><span class="n">listenfd</span><span class="p">,</span> <span class="p">(</span><span class="n">SA</span> <span class="o">*</span><span class="p">)</span> <span class="nb">NULL</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+
+        <span class="n">ticks</span> <span class="o">=</span> <span class="n">time</span><span class="p">(</span><span class="nb">NULL</span><span class="p">);</span>
+        <span class="n">snprintf</span><span class="p">(</span><span class="n">buff</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">buff</span><span class="p">),</span> <span class="sa"></span><span class="s">&#34;%.24s</span><span class="se">\r\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">ctime</span><span class="p">(</span><span class="o">&amp;</span><span class="n">ticks</span><span class="p">));</span>
+        <span class="n">Write</span><span class="p">(</span><span class="n">connfd</span><span class="p">,</span> <span class="n">buff</span><span class="p">,</span> <span class="n">strlen</span><span class="p">(</span><span class="n">buff</span><span class="p">));</span>
+
+		<span class="n">Close</span><span class="p">(</span><span class="n">connfd</span><span class="p">);</span>
+	<span class="p">}</span>
+<span class="p">}</span></code></pre></div>
+<p><strong>代码解析：</strong></p>
+
+<ol>
+<li><code>listenfd = Socket(AF_INET, SOCK_STREAM, 0);</code> 创建一个IPv4、基于TCP连接的socket，返回socket descriptor。</li>
+<li><code>servaddr.sin_addr.s_addr = htonl(INADDR_ANY);</code> htonl将32位的主机字符顺序转换成网络字符顺序。<code>INADDR_ANY</code>表示<code>0.0.0.0</code>，监听所有的地址；在Ubuntu 16.04，<code>INADDR_ANY</code>定义在<code>/usr/include/linux/in.h</code>中：<code>#define INADDR_ANY ((unsigned long int) 0x00000000)</code>。</li>
+<li><code>Bind(listenfd, (SA *) &amp;servaddr, sizeof(servaddr));</code> 将sockfd绑定在servaddr地址上。</li>
+<li><code>Listen(listenfd, LISTENQ);</code> 等待sockfd收到的连接。第二个参数表示同时能处理的最大链接要求，如果达到最大连接个数，会返回client：ECONNREFUSED的错误。</li>
+<li><code>connfd = Accept(listenfd, (SA *) NULL, NULL);</code> 从listen状态的sockfd接收连接。</li>
+<li><code>Write(connfd, buff, strlen(buff));</code> 将数据buff写入到接收的connfd中。</li>
+<li><code>Close(connfd);</code> 关闭连接。</li>
+</ol>
+</article>
+    <footer class="post-footer">
+      
+      <p class="post-copyright">
+        © This post is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License，please give source if you likes to quote or reproduce.
+      </p>
+    </footer>
+    
+      
+    
+  </section>
+  <footer class="site-footer">
+  <p>© 2017 zouying.is</p>
+  <p>Powered by <a href="https://gohugo.io/" target="_blank">Hugo</a> with theme <a href="https://github.com/laozhu/hugo-nuo" target="_blank">Nuo</a>.</p>
+  
+</footer>
+
+
+
+<script async src="//cdn.bootcss.com/video.js/6.2.8/alt/video.novtt.min.js"></script>
+<script async src="//cdn.bootcss.com/mathjax/2.7.2/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [['$','$'], ['\\(','\\)']],
+      displayMath: [['$$','$$'], ['\[','\]']],
+      processEscapes: true,
+      processEnvironments: true,
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+      TeX: { equationNumbers: { autoNumber: "AMS" },
+      extensions: ["AMSmath.js", "AMSsymbols.js"] }
+    }
+  });
+</script>
+<script type="text/x-mathjax-config">
+  // Fix <code> tags after MathJax finishes running. This is a
+  // hack to overcome a shortcoming of Markdown. Discussion at
+  // https://github.com/mojombo/jekyll/issues/199
+  MathJax.Hub.Queue(() => {
+    MathJax.Hub.getAllJax().map(v => v.SourceElement().parentNode.className += ' has-jax');
+  });
+</script>
+
+<script src="https://xpzouying.github.io/js/bundle.js"></script>
+
+
+
+
+  </body>
+</html>
