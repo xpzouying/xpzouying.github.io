@@ -46,6 +46,18 @@
     </item>
     
     <item>
+      <title>Web service middleware in Golang</title>
+      <link>https://xpzouying.github.io/post/05_middleware_in_golang/</link>
+      <pubDate>Mon, 11 Dec 2017 00:00:00 +0000</pubDate>
+      
+      <guid>https://xpzouying.github.io/post/05_middleware_in_golang/</guid>
+      <description>有时候我们需要统计web service接口的数据，比如记录日志、统计API调用时间、或者对HandleFunc进行错误处理，
+这个时候，middleware就很有帮助。
+最初版本 我们目前有个程序，监听8080端口，提供两个接口，
+1. compute：进行计算，耗时在500ms-1000ms之间 2. version：得到版本号，耗时在10ms-60ms之间  package main import ( &amp;#34;log&amp;#34; &amp;#34;math/rand&amp;#34; &amp;#34;net/http&amp;#34; &amp;#34;time&amp;#34; ) // Compute is compute process for doing task func Compute(w http.ResponseWriter, r *http.Request) { time.Sleep(time.Duration((500 + rand.Intn(500))) * time.Millisecond) } // Version is getting version task func Version(w http.ResponseWriter, r *http.Request) { time.Sleep(time.Duration((10 + rand.Intn(50))) * time.Millisecond) w.Write([]byte(&amp;#34;version&amp;#34;)) } func main() { http.HandleFunc(&amp;#34;/compute&amp;#34;, Compute) http.HandleFunc(&amp;#34;/version&amp;#34;, Version) log.Panic(http.ListenAndServe(&amp;#34;:8080&amp;#34;, nil)) } 调用结果如下，</description>
+    </item>
+    
+    <item>
       <title>TCP网络编程分析：C语言篇</title>
       <link>https://xpzouying.github.io/post/03_c_tcp_program/</link>
       <pubDate>Tue, 28 Nov 2017 00:00:00 +0000</pubDate>

@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <meta charset="utf-8" />
+
+  
+  <title>Web service middleware in Golang</title>
+
+  
+  
+
+
+
+
+  
+  <meta name="author" content="zouying" />
+  <meta name="description" content="有时候我们需要统计web service接口的数据，比如记录日志、统计API调用时间、或者对HandleFunc进行错误处理，
+这个时候，middleware就很有帮助。
+最初版本 我们目前有个程序，监听8080端口，提供两个接口，
+1. compute：进行计算，耗时在500ms-1000ms之间 2. version：得到版本号，耗时在10ms-60ms之间  package main import ( &amp;#34;log&amp;#34; &amp;#34;math/rand&amp;#34; &amp;#34;net/http&amp;#34; &amp;#34;time&amp;#34; ) // Compute is compute process for doing task func Compute(w http.ResponseWriter, r *http.Request) { time.Sleep(time.Duration((500 &#43; rand.Intn(500))) * time.Millisecond) } // Version is getting version task func Version(w http.ResponseWriter, r *http.Request) { time.Sleep(time.Duration((10 &#43; rand.Intn(50))) * time.Millisecond) w.Write([]byte(&amp;#34;version&amp;#34;)) } func main() { http.HandleFunc(&amp;#34;/compute&amp;#34;, Compute) http.HandleFunc(&amp;#34;/version&amp;#34;, Version) log.Panic(http.ListenAndServe(&amp;#34;:8080&amp;#34;, nil)) } 调用结果如下，" />
+
+  
+  
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:site" content="@xpzouying" />
+    <meta name="twitter:title" content="Web service middleware in Golang" />
+    <meta name="twitter:description" content="有时候我们需要统计web service接口的数据，比如记录日志、统计API调用时间、或者对HandleFunc进行错误处理，
+这个时候，middleware就很有帮助。
+最初版本 我们目前有个程序，监听8080端口，提供两个接口，
+1. compute：进行计算，耗时在500ms-1000ms之间 2. version：得到版本号，耗时在10ms-60ms之间  package main import ( &amp;#34;log&amp;#34; &amp;#34;math/rand&amp;#34; &amp;#34;net/http&amp;#34; &amp;#34;time&amp;#34; ) // Compute is compute process for doing task func Compute(w http.ResponseWriter, r *http.Request) { time.Sleep(time.Duration((500 &#43; rand.Intn(500))) * time.Millisecond) } // Version is getting version task func Version(w http.ResponseWriter, r *http.Request) { time.Sleep(time.Duration((10 &#43; rand.Intn(50))) * time.Millisecond) w.Write([]byte(&amp;#34;version&amp;#34;)) } func main() { http.HandleFunc(&amp;#34;/compute&amp;#34;, Compute) http.HandleFunc(&amp;#34;/version&amp;#34;, Version) log.Panic(http.ListenAndServe(&amp;#34;:8080&amp;#34;, nil)) } 调用结果如下，" />
+    <meta name="twitter:image" content="https://xpzouying.github.io/img/avatar.jpg" />
+  
+
+
+
+
+<meta name="generator" content="Hugo 0.30.2" />
+
+
+<link rel="canonical" href="https://xpzouying.github.io/post/05_middleware_in_golang/" />
+<link rel="alternative" href="https://xpzouying.github.io/index.xml" title="zouying.is" type="application/atom+xml" />
+
+
+<meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="format-detection" content="telephone=no,email=no,adress=no" />
+<meta http-equiv="Cache-Control" content="no-transform" />
+
+
+<meta name="robots" content="index,follow" />
+<meta name="referrer" content="origin-when-cross-origin" />
+
+
+
+
+
+
+
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="zouying.is" />
+<meta name="msapplication-tooltip" content="zouying.is" />
+<meta name='msapplication-navbutton-color' content="#5fbf5e" />
+<meta name="msapplication-TileColor" content="#5fbf5e" />
+<meta name="msapplication-TileImage" content="/img/tile-image-windows.png" />
+<link rel="icon" href="https://xpzouying.github.io/img/favicon.ico" />
+<link rel="icon" type="image/png" sizes="16x16" href="https://xpzouying.github.io/img/favicon-16x16.png" />
+<link rel="icon" type="image/png" sizes="32x32" href="https://xpzouying.github.io/img/favicon-32x32.png" />
+<link rel="icon" sizes="192x192" href="https://xpzouying.github.io/img/touch-icon-android.png" />
+<link rel="apple-touch-icon" href="https://xpzouying.github.io/img/touch-icon-apple.png" />
+<link rel="mask-icon" href="https://xpzouying.github.io/img/safari-pinned-tab.svg" color="#5fbf5e" />
+
+
+
+<link rel="stylesheet" href="//cdn.bootcss.com/video.js/6.2.8/alt/video-js-cdn.min.css" />
+
+<link rel="stylesheet" href="https://xpzouying.github.io/css/bundle.css" />
+
+
+  
+  <!--[if lt IE 9]>
+    <script src="//cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="//cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+    <script src="//cdn.bootcss.com/video.js/6.2.8/ie8/videojs-ie8.min.js"></script>
+  <![endif]-->
+
+<!--[if lte IE 11]>
+    <script src="//cdn.bootcss.com/classlist/1.1.20170427/classList.min.js"></script>
+  <![endif]-->
+
+
+<script src="//cdn.bootcss.com/object-fit-images/3.2.3/ofi.min.js"></script>
+
+
+<script src="//cdn.bootcss.com/smooth-scroll/12.1.4/js/smooth-scroll.polyfills.min.js"></script>
+
+
+</head>
+  <body>
+    
+    <div class="suspension">
+      <a title="Go to top" class="to-top is-hide"><span class="icon icon-up"></span></a>
+      
+        
+      
+    </div>
+    
+    
+  <header class="site-header">
+  <img class="avatar" src="https://xpzouying.github.io/img/avatar.jpg" alt="Avatar">
+  
+  <h2 class="title">zouying.is</h2>
+  
+  <p class="subtitle">我们都生活在阴沟里，但仍有人仰望星空</p>
+  <button class="menu-toggle" type="button">
+    <span class="icon icon-menu"></span>
+  </button>
+  <nav class="site-menu collapsed">
+    <h2 class="offscreen">Main Menu</h2>
+    <ul class="menu-list">
+      
+      
+      
+      
+        <li class="menu-item  is-active"><a href="https://xpzouying.github.io/">首页</a></li>
+      
+        <li class="menu-item "><a href="https://xpzouying.github.io/cats/cats/">猫之家</a></li>
+      
+        <li class="menu-item "><a href="https://xpzouying.github.io/about/">我是谁</a></li>
+      
+    </ul>
+  </nav>
+  <nav class="social-menu collapsed">
+    <h2 class="offscreen">Social Networks</h2>
+    <ul class="social-list">
+
+      
+      <li class="social-item">
+        <a href="mailto:xpzouying@gmail.com" title="Email"><span class="icon icon-email"></span></a>
+      </li>
+
+      
+      <li class="social-item">
+        <a href="//github.com/xpzouying" title="GitHub"><span class="icon icon-github"></span></a>
+      </li>
+
+      <li class="social-item">
+        <a href="//twitter.com/xpzouying" title="Twitter"><span class="icon icon-twitter"></span></a>
+      </li>
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      <li class="social-item">
+        <a href="https://xpzouying.github.io/index.xml"><span class="icon icon-rss" title="RSS"></span></a>
+      </li>
+
+    </ul>
+  </nav>
+</header>
+
+  <section class="main post-detail">
+    <header class="post-header">
+      <h1 class="post-title">Web service middleware in Golang</h1>
+      <p class="post-meta">@zouying · Dec 11, 2017 · 2 min read</p>
+    </header>
+    <article class="post-content">
+
+<p>有时候我们需要统计web service接口的数据，比如记录日志、统计API调用时间、或者对HandleFunc进行错误处理，</p>
+
+<p>这个时候，middleware就很有帮助。</p>
+
+<h2 id="最初版本">最初版本</h2>
+
+<p>我们目前有个程序，监听8080端口，提供两个接口，</p>
+
+<pre><code>1. compute：进行计算，耗时在500ms-1000ms之间
+2. version：得到版本号，耗时在10ms-60ms之间
+</code></pre>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kn">package</span> <span class="nx">main</span>
+
+<span class="kn">import</span> <span class="p">(</span>
+	<span class="s">&#34;log&#34;</span>
+	<span class="s">&#34;math/rand&#34;</span>
+	<span class="s">&#34;net/http&#34;</span>
+	<span class="s">&#34;time&#34;</span>
+<span class="p">)</span>
+
+<span class="c1">// Compute is compute process for doing task
+</span><span class="c1"></span><span class="kd">func</span> <span class="nx">Compute</span><span class="p">(</span><span class="nx">w</span> <span class="nx">http</span><span class="p">.</span><span class="nx">ResponseWriter</span><span class="p">,</span> <span class="nx">r</span> <span class="o">*</span><span class="nx">http</span><span class="p">.</span><span class="nx">Request</span><span class="p">)</span> <span class="p">{</span>
+	<span class="nx">time</span><span class="p">.</span><span class="nx">Sleep</span><span class="p">(</span><span class="nx">time</span><span class="p">.</span><span class="nx">Duration</span><span class="p">((</span><span class="mi">500</span> <span class="o">+</span> <span class="nx">rand</span><span class="p">.</span><span class="nx">Intn</span><span class="p">(</span><span class="mi">500</span><span class="p">)))</span> <span class="o">*</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Millisecond</span><span class="p">)</span>
+<span class="p">}</span>
+
+
+<span class="c1">// Version is getting version task
+</span><span class="c1"></span><span class="kd">func</span> <span class="nx">Version</span><span class="p">(</span><span class="nx">w</span> <span class="nx">http</span><span class="p">.</span><span class="nx">ResponseWriter</span><span class="p">,</span> <span class="nx">r</span> <span class="o">*</span><span class="nx">http</span><span class="p">.</span><span class="nx">Request</span><span class="p">)</span> <span class="p">{</span>
+	<span class="nx">time</span><span class="p">.</span><span class="nx">Sleep</span><span class="p">(</span><span class="nx">time</span><span class="p">.</span><span class="nx">Duration</span><span class="p">((</span><span class="mi">10</span> <span class="o">+</span> <span class="nx">rand</span><span class="p">.</span><span class="nx">Intn</span><span class="p">(</span><span class="mi">50</span><span class="p">)))</span> <span class="o">*</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Millisecond</span><span class="p">)</span>
+	<span class="nx">w</span><span class="p">.</span><span class="nx">Write</span><span class="p">([]</span><span class="nb">byte</span><span class="p">(</span><span class="s">&#34;version&#34;</span><span class="p">))</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="nx">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="nx">http</span><span class="p">.</span><span class="nx">HandleFunc</span><span class="p">(</span><span class="s">&#34;/compute&#34;</span><span class="p">,</span> <span class="nx">Compute</span><span class="p">)</span>
+    <span class="nx">http</span><span class="p">.</span><span class="nx">HandleFunc</span><span class="p">(</span><span class="s">&#34;/version&#34;</span><span class="p">,</span> <span class="nx">Version</span><span class="p">)</span>
+
+	<span class="nx">log</span><span class="p">.</span><span class="nx">Panic</span><span class="p">(</span><span class="nx">http</span><span class="p">.</span><span class="nx">ListenAndServe</span><span class="p">(</span><span class="s">&#34;:8080&#34;</span><span class="p">,</span> <span class="kc">nil</span><span class="p">))</span>
+<span class="p">}</span></code></pre></div>
+<p>调用结果如下，</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash"><span class="c1"># curl http://localhost:8080/compute
+</span><span class="c1"></span>finish</code></pre></div>
+<h2 id="增加日志">增加日志</h2>
+
+<p>需要记录每次调用接口的名字。</p>
+
+<p>有两种方式记录日志，</p>
+
+<pre><code>1. 在每一个HandleFunc第一行输出URI
+2. 增加中间件封装HandleFunc
+</code></pre>
+
+<p>对于第一种情况，修改Compute()函数为，</p>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// Compute is compute process for doing task
+</span><span class="c1"></span><span class="kd">func</span> <span class="nx">Compute</span><span class="p">(</span><span class="nx">w</span> <span class="nx">http</span><span class="p">.</span><span class="nx">ResponseWriter</span><span class="p">,</span> <span class="nx">r</span> <span class="o">*</span><span class="nx">http</span><span class="p">.</span><span class="nx">Request</span><span class="p">)</span> <span class="p">{</span>
+	<span class="nx">log</span><span class="p">.</span><span class="nx">Printf</span><span class="p">(</span><span class="nx">r</span><span class="p">.</span><span class="nx">RequestURI</span><span class="p">)</span>
+
+	<span class="nx">time</span><span class="p">.</span><span class="nx">Sleep</span><span class="p">(</span><span class="nx">time</span><span class="p">.</span><span class="nx">Duration</span><span class="p">((</span><span class="mi">500</span> <span class="o">+</span> <span class="nx">rand</span><span class="p">.</span><span class="nx">Intn</span><span class="p">(</span><span class="mi">500</span><span class="p">)))</span> <span class="o">*</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Millisecond</span><span class="p">)</span>
+	<span class="nx">w</span><span class="p">.</span><span class="nx">Write</span><span class="p">([]</span><span class="nb">byte</span><span class="p">(</span><span class="s">&#34;finish&#34;</span><span class="p">))</span>
+<span class="p">}</span></code></pre></div>
+<p>运行得到结果为，</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash"><span class="m">2017</span>/12/11 <span class="m">23</span>:07:24 /compute</code></pre></div>
+<p>对于API少的情况，还比较适用。但是对于API接口比较多的情况，修改每一个函数就不太合适。并且当我们不光想统计URI信息时，还需要统计每一个调用接口的其他信息时，就需要修改每一处HandleFunc。</p>
+
+<p>所以我们可以使用<code>Middleware</code>形式来完成。</p>
+
+<p>我们希望使用middlware以后，对于main()函数变为，</p>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="nx">main</span><span class="p">()</span> <span class="p">{</span>
+	<span class="nx">http</span><span class="p">.</span><span class="nx">HandleFunc</span><span class="p">(</span><span class="s">&#34;/compute&#34;</span><span class="p">,</span> <span class="nx">middleware</span><span class="p">(</span><span class="nx">Compute</span><span class="p">))</span>
+	<span class="nx">http</span><span class="p">.</span><span class="nx">HandleFunc</span><span class="p">(</span><span class="s">&#34;/version&#34;</span><span class="p">,</span> <span class="nx">middleware</span><span class="p">(</span><span class="nx">Version</span><span class="p">))</span>
+
+	<span class="nx">log</span><span class="p">.</span><span class="nx">Panic</span><span class="p">(</span><span class="nx">http</span><span class="p">.</span><span class="nx">ListenAndServe</span><span class="p">(</span><span class="s">&#34;:8080&#34;</span><span class="p">,</span> <span class="kc">nil</span><span class="p">))</span>
+<span class="p">}</span></code></pre></div>
+<p>使用middlware对每一个http handle func进行封装，在middleware中进行相应的需求处理，比如日志记录、错误处理、用时统计等。</p>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="nx">middleware</span><span class="p">(</span><span class="nx">fn</span> <span class="kd">func</span><span class="p">(</span><span class="nx">w</span> <span class="nx">http</span><span class="p">.</span><span class="nx">ResponseWriter</span><span class="p">,</span> <span class="nx">r</span> <span class="o">*</span><span class="nx">http</span><span class="p">.</span><span class="nx">Request</span><span class="p">))</span> <span class="kd">func</span><span class="p">(</span><span class="nx">w</span> <span class="nx">http</span><span class="p">.</span><span class="nx">ResponseWriter</span><span class="p">,</span> <span class="nx">r</span> <span class="o">*</span><span class="nx">http</span><span class="p">.</span><span class="nx">Request</span><span class="p">)</span> <span class="p">{</span>
+	<span class="k">return</span> <span class="kd">func</span><span class="p">(</span><span class="nx">w</span> <span class="nx">http</span><span class="p">.</span><span class="nx">ResponseWriter</span><span class="p">,</span> <span class="nx">r</span> <span class="o">*</span><span class="nx">http</span><span class="p">.</span><span class="nx">Request</span><span class="p">)</span> <span class="p">{</span>
+		<span class="nx">begin</span> <span class="o">:=</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Now</span><span class="p">()</span>
+		<span class="k">defer</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+			<span class="nx">log</span><span class="p">.</span><span class="nx">Printf</span><span class="p">(</span><span class="s">&#34;time_used: %v&#34;</span><span class="p">,</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Now</span><span class="p">().</span><span class="nx">Sub</span><span class="p">(</span><span class="nx">begin</span><span class="p">))</span>
+		<span class="p">}()</span>
+		<span class="c1">// logging
+</span><span class="c1"></span>		<span class="nx">log</span><span class="p">.</span><span class="nx">Printf</span><span class="p">(</span><span class="nx">r</span><span class="p">.</span><span class="nx">RequestURI</span><span class="p">)</span>
+
+		<span class="nx">fn</span><span class="p">(</span><span class="nx">w</span><span class="p">,</span> <span class="nx">r</span><span class="p">)</span>
+	<span class="p">}</span>
+<span class="p">}</span></code></pre></div>
+<p><code>middlware</code>入参和返回值都为<code>func(w http.ResponseWriter, r *http.Request)</code>类型。</p>
+
+<p>在<code>middleware</code>中，进行了调用接口URI的统计和用时统计。</p>
+
+<p>完整的代码如下，</p>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kn">package</span> <span class="nx">main</span>
+
+<span class="kn">import</span> <span class="p">(</span>
+	<span class="s">&#34;log&#34;</span>
+	<span class="s">&#34;math/rand&#34;</span>
+	<span class="s">&#34;net/http&#34;</span>
+	<span class="s">&#34;time&#34;</span>
+<span class="p">)</span>
+
+<span class="c1">// Compute is compute process for doing task
+</span><span class="c1"></span><span class="kd">func</span> <span class="nx">Compute</span><span class="p">(</span><span class="nx">w</span> <span class="nx">http</span><span class="p">.</span><span class="nx">ResponseWriter</span><span class="p">,</span> <span class="nx">r</span> <span class="o">*</span><span class="nx">http</span><span class="p">.</span><span class="nx">Request</span><span class="p">)</span> <span class="p">{</span>
+	<span class="nx">time</span><span class="p">.</span><span class="nx">Sleep</span><span class="p">(</span><span class="nx">time</span><span class="p">.</span><span class="nx">Duration</span><span class="p">((</span><span class="mi">500</span> <span class="o">+</span> <span class="nx">rand</span><span class="p">.</span><span class="nx">Intn</span><span class="p">(</span><span class="mi">500</span><span class="p">)))</span> <span class="o">*</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Millisecond</span><span class="p">)</span>
+	<span class="nx">w</span><span class="p">.</span><span class="nx">Write</span><span class="p">([]</span><span class="nb">byte</span><span class="p">(</span><span class="s">&#34;finish&#34;</span><span class="p">))</span>
+<span class="p">}</span>
+
+<span class="c1">// Version is getting version task
+</span><span class="c1"></span><span class="kd">func</span> <span class="nx">Version</span><span class="p">(</span><span class="nx">w</span> <span class="nx">http</span><span class="p">.</span><span class="nx">ResponseWriter</span><span class="p">,</span> <span class="nx">r</span> <span class="o">*</span><span class="nx">http</span><span class="p">.</span><span class="nx">Request</span><span class="p">)</span> <span class="p">{</span>
+	<span class="nx">time</span><span class="p">.</span><span class="nx">Sleep</span><span class="p">(</span><span class="nx">time</span><span class="p">.</span><span class="nx">Duration</span><span class="p">((</span><span class="mi">10</span> <span class="o">+</span> <span class="nx">rand</span><span class="p">.</span><span class="nx">Intn</span><span class="p">(</span><span class="mi">50</span><span class="p">)))</span> <span class="o">*</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Millisecond</span><span class="p">)</span>
+	<span class="nx">w</span><span class="p">.</span><span class="nx">Write</span><span class="p">([]</span><span class="nb">byte</span><span class="p">(</span><span class="s">&#34;version&#34;</span><span class="p">))</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="nx">middleware</span><span class="p">(</span><span class="nx">fn</span> <span class="kd">func</span><span class="p">(</span><span class="nx">w</span> <span class="nx">http</span><span class="p">.</span><span class="nx">ResponseWriter</span><span class="p">,</span> <span class="nx">r</span> <span class="o">*</span><span class="nx">http</span><span class="p">.</span><span class="nx">Request</span><span class="p">))</span> <span class="kd">func</span><span class="p">(</span><span class="nx">w</span> <span class="nx">http</span><span class="p">.</span><span class="nx">ResponseWriter</span><span class="p">,</span> <span class="nx">r</span> <span class="o">*</span><span class="nx">http</span><span class="p">.</span><span class="nx">Request</span><span class="p">)</span> <span class="p">{</span>
+	<span class="k">return</span> <span class="kd">func</span><span class="p">(</span><span class="nx">w</span> <span class="nx">http</span><span class="p">.</span><span class="nx">ResponseWriter</span><span class="p">,</span> <span class="nx">r</span> <span class="o">*</span><span class="nx">http</span><span class="p">.</span><span class="nx">Request</span><span class="p">)</span> <span class="p">{</span>
+		<span class="nx">begin</span> <span class="o">:=</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Now</span><span class="p">()</span>
+		<span class="k">defer</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+			<span class="nx">log</span><span class="p">.</span><span class="nx">Printf</span><span class="p">(</span><span class="s">&#34;time_used: %v&#34;</span><span class="p">,</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Now</span><span class="p">().</span><span class="nx">Sub</span><span class="p">(</span><span class="nx">begin</span><span class="p">))</span>
+		<span class="p">}()</span>
+		<span class="c1">// logging
+</span><span class="c1"></span>		<span class="nx">log</span><span class="p">.</span><span class="nx">Printf</span><span class="p">(</span><span class="nx">r</span><span class="p">.</span><span class="nx">RequestURI</span><span class="p">)</span>
+
+		<span class="nx">fn</span><span class="p">(</span><span class="nx">w</span><span class="p">,</span> <span class="nx">r</span><span class="p">)</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="nx">main</span><span class="p">()</span> <span class="p">{</span>
+	<span class="nx">http</span><span class="p">.</span><span class="nx">HandleFunc</span><span class="p">(</span><span class="s">&#34;/compute&#34;</span><span class="p">,</span> <span class="nx">middleware</span><span class="p">(</span><span class="nx">Compute</span><span class="p">))</span>
+	<span class="nx">http</span><span class="p">.</span><span class="nx">HandleFunc</span><span class="p">(</span><span class="s">&#34;/version&#34;</span><span class="p">,</span> <span class="nx">middleware</span><span class="p">(</span><span class="nx">Version</span><span class="p">))</span>
+
+	<span class="nx">log</span><span class="p">.</span><span class="nx">Panic</span><span class="p">(</span><span class="nx">http</span><span class="p">.</span><span class="nx">ListenAndServe</span><span class="p">(</span><span class="s">&#34;:8080&#34;</span><span class="p">,</span> <span class="kc">nil</span><span class="p">))</span>
+<span class="p">}</span></code></pre></div>
+<h2 id="source-code-in-github-com">Source code in github.com</h2>
+
+<ul>
+<li><a href="https://github.com/xpzouying/go-practice/blob/master/web_service_middleware_in_golang/main.go">https://github.com/xpzouying/go-practice/blob/master/web_service_middleware_in_golang/main.go</a></li>
+</ul>
+</article>
+    <footer class="post-footer">
+      
+      <p class="post-copyright">
+        © This post is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License，please give source if you likes to quote or reproduce.
+      </p>
+    </footer>
+    
+      
+    
+  </section>
+  <footer class="site-footer">
+  <p>© 2017 zouying.is</p>
+  <p>Powered by <a href="https://gohugo.io/" target="_blank">Hugo</a> with theme <a href="https://github.com/laozhu/hugo-nuo" target="_blank">Nuo</a>.</p>
+  
+</footer>
+
+
+
+<script async src="//cdn.bootcss.com/video.js/6.2.8/alt/video.novtt.min.js"></script>
+<script async src="//cdn.bootcss.com/mathjax/2.7.2/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [['$','$'], ['\\(','\\)']],
+      displayMath: [['$$','$$'], ['\[','\]']],
+      processEscapes: true,
+      processEnvironments: true,
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+      TeX: { equationNumbers: { autoNumber: "AMS" },
+      extensions: ["AMSmath.js", "AMSsymbols.js"] }
+    }
+  });
+</script>
+<script type="text/x-mathjax-config">
+  // Fix <code> tags after MathJax finishes running. This is a
+  // hack to overcome a shortcoming of Markdown. Discussion at
+  // https://github.com/mojombo/jekyll/issues/199
+  MathJax.Hub.Queue(() => {
+    MathJax.Hub.getAllJax().map(v => v.SourceElement().parentNode.className += ' has-jax');
+  });
+</script>
+
+<script src="https://xpzouying.github.io/js/bundle.js"></script>
+
+
+
+
+  </body>
+</html>

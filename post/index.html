@@ -197,6 +197,22 @@
       
         <article class="post-entry">
   <header class="post-header">
+    <h3 class="post-title"><a href="https://xpzouying.github.io/post/05_middleware_in_golang/" class="post-link">Web service middleware in Golang</a></h3>
+    <p class="post-meta">@zouying · Dec 11, 2017 · 2 min read</p>
+  </header>
+  
+  <p class="post-summary">有时候我们需要统计web service接口的数据，比如记录日志、统计API调用时间、或者对HandleFunc进行错误处理，
+这个时候，middleware就很有帮助。
+最初版本 我们目前有个程序，监听8080端口，提供两个接口，
+1. compute：进行计算，耗时在500ms-1000ms之间 2. version：得到版本号，耗时在10ms-60ms之间  package main import ( &#34;log&#34; &#34;math/rand&#34; &#34;net/http&#34; &#34;time&#34; ) // Compute is compute process for doing task func Compute(w http.ResponseWriter, r *http.Request) { time.Sleep(time.Duration((500 &#43; rand.Intn(500))) * time.Millisecond) } // Version is getting version task func Version(w http.ResponseWriter, r *http.Request) { time.Sleep(time.Duration((10 &#43; rand.Intn(50))) * time.Millisecond) w.Write([]byte(&#34;version&#34;)) } func main() { http.HandleFunc(&#34;/compute&#34;, Compute) http.HandleFunc(&#34;/version&#34;, Version) log.Panic(http.ListenAndServe(&#34;:8080&#34;, nil)) } 调用结果如下，</p>
+  <footer class="post-footer">
+    <a class="read-more" href="https://xpzouying.github.io/post/05_middleware_in_golang/">Read More →</a>
+  </footer>
+</article>
+
+      
+        <article class="post-entry">
+  <header class="post-header">
     <h3 class="post-title"><a href="https://xpzouying.github.io/post/04_interview/" class="post-link">Basic of Interview</a></h3>
     <p class="post-meta">@zouying · Dec 11, 2017 · 1 min read</p>
   </header>
