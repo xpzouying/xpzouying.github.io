@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <meta charset="utf-8" />
+
+  
+  <title>Basic of Interview</title>
+
+  
+  
+
+
+
+
+  
+  <meta name="author" content="zouying" />
+  <meta name="description" content=" Note for Interview 死锁  http://blog.csdn.net/yanxiaolx/article/details/51944048 http://wdxtub.com/interview/14520847747820.html https://www.cnblogs.com/loveyakamoz/archive/2012/11/14/2770812.html  死锁是指两个或多个线程／进程之间相互阻塞，以至于任何一个都不能继续运行，因此也不能解锁其他线程／进程。
+死锁的4个必要条件 - 资源是互斥，不能共享，只能被一个进程使用 - 请求并保持：一个进程已经请求得到至少一个资源后，又提出新的资源请求，而请求的资源被其他占用，此时请求进程阻塞，但是又不释放已经占有的资源。 - 资源分配后不可剥夺 - 循环等待：发生死锁时，必然循环等待的环形链。  产生死锁的原因 - 资源之间存在竞争 - 资源不够 - 资源分配的顺序不对，导致产生循环等待  解决死锁的方法 预防死锁 破坏产生死锁的四个必要条件
+ 资源互斥性：这个没有办法破坏 请求并保持资源：资源一次性分配 资源不可剥夺：申请资源后的可剥夺 循环等待：有需分配  避免死锁 银行家算法
+检测死锁 为每个进程和资源分配唯一的ID，建立资源分配表和进程等待表
+解除死锁  剥夺资源 撤销进程：直接撤销死锁进程或者撤销代价最小的进程，直到拥有足够的资源可用，解除死锁为止。  TCP/IP 协议  http://blog.csdn.net/monkeynote/article/details/45868085 ZY: MUST READ!!! UDP vs.TCP Which protocol is best for games? https://gafferongames.com/post/udp_vs_tcp/ 从输入 URL 到页面加载完成的过程中都发生了什么事情？ Beej&amp;rsquo;s Guide to Network Programming Using Internet Sockets 链接中有中文版 通俗大白话来理解TCP协议的三次握手和四次分手 #14 前端经典面试题: 从输入URL到页面加载发生了什么？  TCP vs UDP TCP: - 有连接的 - 可靠性和顺序保证 - 自动将你的数据分成Packets（IP层的数据包） - 确保数据在网络中不会发送的太快 (流量控制) - 容易使用，像读写文件一样  UDP： - 没有连接的概念，需要自己主机到主机的维护 - 没有可靠性和按序到达的保证，数据包到达时可能乱序、重复，也可能完全丢失 - 需要自己切分成合适的Packets（add：UDP包有大小限制，控制在548字节以内，大了有丢包风险） - 需要自己在程序逻辑中确保发包速度不能太快（add：发包频率一定要控制，速度开也增大丢包风险） - 需要自己在程序逻辑中实现丢包重传  " />
+
+  
+  
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:site" content="@xpzouying" />
+    <meta name="twitter:title" content="Basic of Interview" />
+    <meta name="twitter:description" content=" Note for Interview 死锁  http://blog.csdn.net/yanxiaolx/article/details/51944048 http://wdxtub.com/interview/14520847747820.html https://www.cnblogs.com/loveyakamoz/archive/2012/11/14/2770812.html  死锁是指两个或多个线程／进程之间相互阻塞，以至于任何一个都不能继续运行，因此也不能解锁其他线程／进程。
+死锁的4个必要条件 - 资源是互斥，不能共享，只能被一个进程使用 - 请求并保持：一个进程已经请求得到至少一个资源后，又提出新的资源请求，而请求的资源被其他占用，此时请求进程阻塞，但是又不释放已经占有的资源。 - 资源分配后不可剥夺 - 循环等待：发生死锁时，必然循环等待的环形链。  产生死锁的原因 - 资源之间存在竞争 - 资源不够 - 资源分配的顺序不对，导致产生循环等待  解决死锁的方法 预防死锁 破坏产生死锁的四个必要条件
+ 资源互斥性：这个没有办法破坏 请求并保持资源：资源一次性分配 资源不可剥夺：申请资源后的可剥夺 循环等待：有需分配  避免死锁 银行家算法
+检测死锁 为每个进程和资源分配唯一的ID，建立资源分配表和进程等待表
+解除死锁  剥夺资源 撤销进程：直接撤销死锁进程或者撤销代价最小的进程，直到拥有足够的资源可用，解除死锁为止。  TCP/IP 协议  http://blog.csdn.net/monkeynote/article/details/45868085 ZY: MUST READ!!! UDP vs.TCP Which protocol is best for games? https://gafferongames.com/post/udp_vs_tcp/ 从输入 URL 到页面加载完成的过程中都发生了什么事情？ Beej&amp;rsquo;s Guide to Network Programming Using Internet Sockets 链接中有中文版 通俗大白话来理解TCP协议的三次握手和四次分手 #14 前端经典面试题: 从输入URL到页面加载发生了什么？  TCP vs UDP TCP: - 有连接的 - 可靠性和顺序保证 - 自动将你的数据分成Packets（IP层的数据包） - 确保数据在网络中不会发送的太快 (流量控制) - 容易使用，像读写文件一样  UDP： - 没有连接的概念，需要自己主机到主机的维护 - 没有可靠性和按序到达的保证，数据包到达时可能乱序、重复，也可能完全丢失 - 需要自己切分成合适的Packets（add：UDP包有大小限制，控制在548字节以内，大了有丢包风险） - 需要自己在程序逻辑中确保发包速度不能太快（add：发包频率一定要控制，速度开也增大丢包风险） - 需要自己在程序逻辑中实现丢包重传  " />
+    <meta name="twitter:image" content="https://xpzouying.github.io/img/avatar.jpg" />
+  
+
+
+
+
+<meta name="generator" content="Hugo 0.30.2" />
+
+
+<link rel="canonical" href="https://xpzouying.github.io/post/04_interview/" />
+<link rel="alternative" href="https://xpzouying.github.io/index.xml" title="zouying.is" type="application/atom+xml" />
+
+
+<meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="format-detection" content="telephone=no,email=no,adress=no" />
+<meta http-equiv="Cache-Control" content="no-transform" />
+
+
+<meta name="robots" content="index,follow" />
+<meta name="referrer" content="origin-when-cross-origin" />
+
+
+
+
+
+
+
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="zouying.is" />
+<meta name="msapplication-tooltip" content="zouying.is" />
+<meta name='msapplication-navbutton-color' content="#5fbf5e" />
+<meta name="msapplication-TileColor" content="#5fbf5e" />
+<meta name="msapplication-TileImage" content="/img/tile-image-windows.png" />
+<link rel="icon" href="https://xpzouying.github.io/img/favicon.ico" />
+<link rel="icon" type="image/png" sizes="16x16" href="https://xpzouying.github.io/img/favicon-16x16.png" />
+<link rel="icon" type="image/png" sizes="32x32" href="https://xpzouying.github.io/img/favicon-32x32.png" />
+<link rel="icon" sizes="192x192" href="https://xpzouying.github.io/img/touch-icon-android.png" />
+<link rel="apple-touch-icon" href="https://xpzouying.github.io/img/touch-icon-apple.png" />
+<link rel="mask-icon" href="https://xpzouying.github.io/img/safari-pinned-tab.svg" color="#5fbf5e" />
+
+
+
+<link rel="stylesheet" href="//cdn.bootcss.com/video.js/6.2.8/alt/video-js-cdn.min.css" />
+
+<link rel="stylesheet" href="https://xpzouying.github.io/css/bundle.css" />
+
+
+  
+  <!--[if lt IE 9]>
+    <script src="//cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="//cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+    <script src="//cdn.bootcss.com/video.js/6.2.8/ie8/videojs-ie8.min.js"></script>
+  <![endif]-->
+
+<!--[if lte IE 11]>
+    <script src="//cdn.bootcss.com/classlist/1.1.20170427/classList.min.js"></script>
+  <![endif]-->
+
+
+<script src="//cdn.bootcss.com/object-fit-images/3.2.3/ofi.min.js"></script>
+
+
+<script src="//cdn.bootcss.com/smooth-scroll/12.1.4/js/smooth-scroll.polyfills.min.js"></script>
+
+
+</head>
+  <body>
+    
+    <div class="suspension">
+      <a title="Go to top" class="to-top is-hide"><span class="icon icon-up"></span></a>
+      
+        
+      
+    </div>
+    
+    
+  <header class="site-header">
+  <img class="avatar" src="https://xpzouying.github.io/img/avatar.jpg" alt="Avatar">
+  
+  <h2 class="title">zouying.is</h2>
+  
+  <p class="subtitle">我们都生活在阴沟里，但仍有人仰望星空</p>
+  <button class="menu-toggle" type="button">
+    <span class="icon icon-menu"></span>
+  </button>
+  <nav class="site-menu collapsed">
+    <h2 class="offscreen">Main Menu</h2>
+    <ul class="menu-list">
+      
+      
+      
+      
+        <li class="menu-item  is-active"><a href="https://xpzouying.github.io/">首页</a></li>
+      
+        <li class="menu-item "><a href="https://xpzouying.github.io/cats/cats/">猫之家</a></li>
+      
+        <li class="menu-item "><a href="https://xpzouying.github.io/about/">我是谁</a></li>
+      
+    </ul>
+  </nav>
+  <nav class="social-menu collapsed">
+    <h2 class="offscreen">Social Networks</h2>
+    <ul class="social-list">
+
+      
+      <li class="social-item">
+        <a href="mailto:xpzouying@gmail.com" title="Email"><span class="icon icon-email"></span></a>
+      </li>
+
+      
+      <li class="social-item">
+        <a href="//github.com/xpzouying" title="GitHub"><span class="icon icon-github"></span></a>
+      </li>
+
+      <li class="social-item">
+        <a href="//twitter.com/xpzouying" title="Twitter"><span class="icon icon-twitter"></span></a>
+      </li>
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      <li class="social-item">
+        <a href="https://xpzouying.github.io/index.xml"><span class="icon icon-rss" title="RSS"></span></a>
+      </li>
+
+    </ul>
+  </nav>
+</header>
+
+  <section class="main post-detail">
+    <header class="post-header">
+      <h1 class="post-title">Basic of Interview</h1>
+      <p class="post-meta">@zouying · Dec 11, 2017 · 1 min read</p>
+    </header>
+    <article class="post-content">
+
+<h1 id="note-for-interview">Note for Interview</h1>
+
+<h2 id="死锁">死锁</h2>
+
+<ul>
+<li><a href="http://blog.csdn.net/yanxiaolx/article/details/51944048">http://blog.csdn.net/yanxiaolx/article/details/51944048</a></li>
+<li><a href="http://wdxtub.com/interview/14520847747820.html">http://wdxtub.com/interview/14520847747820.html</a></li>
+<li><a href="https://www.cnblogs.com/loveyakamoz/archive/2012/11/14/2770812.html">https://www.cnblogs.com/loveyakamoz/archive/2012/11/14/2770812.html</a></li>
+</ul>
+
+<p><code>死锁</code>是指两个或多个线程／进程之间相互阻塞，以至于任何一个都不能继续运行，因此也不能解锁其他线程／进程。</p>
+
+<h3 id="死锁的4个必要条件">死锁的4个必要条件</h3>
+
+<pre><code>- 资源是互斥，不能共享，只能被一个进程使用
+- 请求并保持：一个进程已经请求得到至少一个资源后，又提出新的资源请求，而请求的资源被其他占用，此时请求进程阻塞，但是又不释放已经占有的资源。
+- 资源分配后不可剥夺
+- 循环等待：发生死锁时，必然循环等待的环形链。
+</code></pre>
+
+<h3 id="产生死锁的原因">产生死锁的原因</h3>
+
+<pre><code>- 资源之间存在竞争
+- 资源不够
+- 资源分配的顺序不对，导致产生循环等待
+</code></pre>
+
+<h3 id="解决死锁的方法">解决死锁的方法</h3>
+
+<h4 id="预防死锁">预防死锁</h4>
+
+<p>破坏产生死锁的四个必要条件</p>
+
+<ul>
+<li>资源互斥性：这个没有办法破坏</li>
+<li>请求并保持资源：资源一次性分配</li>
+<li>资源不可剥夺：申请资源后的可剥夺</li>
+<li>循环等待：有需分配</li>
+</ul>
+
+<h4 id="避免死锁">避免死锁</h4>
+
+<p>银行家算法</p>
+
+<h4 id="检测死锁">检测死锁</h4>
+
+<p>为每个进程和资源分配唯一的ID，建立资源分配表和进程等待表</p>
+
+<h4 id="解除死锁">解除死锁</h4>
+
+<ul>
+<li>剥夺资源</li>
+<li>撤销进程：直接撤销<strong>死锁进程</strong>或者撤销<strong>代价最小</strong>的进程，直到拥有足够的资源可用，解除死锁为止。</li>
+</ul>
+
+<h2 id="tcp-ip-协议">TCP/IP 协议</h2>
+
+<ul>
+<li><a href="http://blog.csdn.net/monkeynote/article/details/45868085">http://blog.csdn.net/monkeynote/article/details/45868085</a></li>
+<li>ZY: MUST READ!!! UDP vs.TCP Which protocol is best for games? <a href="https://gafferongames.com/post/udp_vs_tcp/">https://gafferongames.com/post/udp_vs_tcp/</a></li>
+<li><a href="http://fex.baidu.com/blog/2014/05/what-happen/">从输入 URL 到页面加载完成的过程中都发生了什么事情？</a></li>
+<li><a href="https://beej.us/guide/bgnet/">Beej&rsquo;s Guide to Network Programming Using Internet Sockets</a> 链接中有中文版</li>
+<li><a href="https://github.com/jawil/blog/issues/14">通俗大白话来理解TCP协议的三次握手和四次分手 #14</a></li>
+<li><a href="https://segmentfault.com/a/1190000006879700">前端经典面试题: 从输入URL到页面加载发生了什么？</a></li>
+</ul>
+
+<h3 id="tcp-vs-udp">TCP vs UDP</h3>
+
+<h4 id="tcp">TCP:</h4>
+
+<pre><code>- 有连接的
+- 可靠性和顺序保证
+- 自动将你的数据分成Packets（IP层的数据包）
+- 确保数据在网络中不会发送的太快 (流量控制)
+- 容易使用，像读写文件一样
+</code></pre>
+
+<h4 id="udp">UDP：</h4>
+
+<pre><code>- 没有连接的概念，需要自己主机到主机的维护
+- 没有可靠性和按序到达的保证，数据包到达时可能乱序、重复，也可能完全丢失
+- 需要自己切分成合适的Packets（add：UDP包有大小限制，控制在548字节以内，大了有丢包风险）
+- 需要自己在程序逻辑中确保发包速度不能太快（add：发包频率一定要控制，速度开也增大丢包风险）
+- 需要自己在程序逻辑中实现丢包重传
+</code></pre>
+</article>
+    <footer class="post-footer">
+      
+      <p class="post-copyright">
+        © This post is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License，please give source if you likes to quote or reproduce.
+      </p>
+    </footer>
+    
+      
+    
+  </section>
+  <footer class="site-footer">
+  <p>© 2017 zouying.is</p>
+  <p>Powered by <a href="https://gohugo.io/" target="_blank">Hugo</a> with theme <a href="https://github.com/laozhu/hugo-nuo" target="_blank">Nuo</a>.</p>
+  
+</footer>
+
+
+
+<script async src="//cdn.bootcss.com/video.js/6.2.8/alt/video.novtt.min.js"></script>
+<script async src="//cdn.bootcss.com/mathjax/2.7.2/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [['$','$'], ['\\(','\\)']],
+      displayMath: [['$$','$$'], ['\[','\]']],
+      processEscapes: true,
+      processEnvironments: true,
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+      TeX: { equationNumbers: { autoNumber: "AMS" },
+      extensions: ["AMSmath.js", "AMSsymbols.js"] }
+    }
+  });
+</script>
+<script type="text/x-mathjax-config">
+  // Fix <code> tags after MathJax finishes running. This is a
+  // hack to overcome a shortcoming of Markdown. Discussion at
+  // https://github.com/mojombo/jekyll/issues/199
+  MathJax.Hub.Queue(() => {
+    MathJax.Hub.getAllJax().map(v => v.SourceElement().parentNode.className += ' has-jax');
+  });
+</script>
+
+<script src="https://xpzouying.github.io/js/bundle.js"></script>
+
+
+
+
+  </body>
+</html>

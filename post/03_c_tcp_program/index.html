@@ -15,24 +15,26 @@
 
   
   <meta name="author" content="zouying" />
-  <meta name="description" content="TCP网络编程分析：C语言篇 参考《Unix Network Programming, Volume 1: The Sockets Networking API (3rd Edition)》
+  <meta name="description" content="TCP网络编程分析：C语言篇 Link: - https://xpzouying.github.io/post/03_c_tcp_program/ - source code in github.com/xpzouying
+参考《Unix Network Programming, Volume 1: The Sockets Networking API (3rd Edition)》
 网络模型
 client端 主要功能：
 client通过tcp访问server，获得服务器时间。
 主要代码如下：
-int main(int argc, char **argv) { int	sockfd, n; char	recvline[MAXLINE &#43; 1]; struct sockaddr_in	servaddr; if (argc != 2) err_quit(&amp;#34;usage: a.out &amp;lt;IPaddress&amp;gt;&amp;#34;); if ( (sockfd = socket(AF_INET, SOCK_STREAM, 0)) &amp;lt; 0) err_sys(&amp;#34;socket error&amp;#34;); bzero(&amp;amp;servaddr, sizeof(servaddr)); servaddr.sin_family = AF_INET; servaddr.sin_port = htons(13);	/* daytime server */ if (inet_pton(AF_INET, argv[1], &amp;amp;servaddr.sin_addr) &amp;lt;= 0) err_quit(&amp;#34;inet_pton error for %s&amp;#34;, argv[1]); if (connect(sockfd, (SA *) &amp;amp;servaddr, sizeof(servaddr)) &amp;lt; 0) err_sys(&amp;#34;connect error&amp;#34;); while ( (n = read(sockfd, recvline, MAXLINE)) &amp;gt; 0) { recvline[n] = 0;	/* null terminate */ if (fputs(recvline, stdout) == EOF) err_sys(&amp;#34;fputs error&amp;#34;); } if (n &amp;lt; 0) err_sys(&amp;#34;read error&amp;#34;); exit(0); } 代码解析：" />
+int main(int argc, char **argv) { int	sockfd, n; char	recvline[MAXLINE &#43; 1]; struct sockaddr_in	servaddr; if (argc != 2) err_quit(&amp;#34;usage: a.out &amp;lt;IPaddress&amp;gt;&amp;#34;); if ( (sockfd = socket(AF_INET, SOCK_STREAM, 0)) &amp;lt; 0) err_sys(&amp;#34;socket error&amp;#34;); bzero(&amp;amp;servaddr, sizeof(servaddr)); servaddr.sin_family = AF_INET; servaddr.sin_port = htons(13);	/* daytime server */ if (inet_pton(AF_INET, argv[1], &amp;amp;servaddr." />
 
   
   
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:site" content="@xpzouying" />
     <meta name="twitter:title" content="TCP网络编程分析：C语言篇" />
-    <meta name="twitter:description" content="TCP网络编程分析：C语言篇 参考《Unix Network Programming, Volume 1: The Sockets Networking API (3rd Edition)》
+    <meta name="twitter:description" content="TCP网络编程分析：C语言篇 Link: - https://xpzouying.github.io/post/03_c_tcp_program/ - source code in github.com/xpzouying
+参考《Unix Network Programming, Volume 1: The Sockets Networking API (3rd Edition)》
 网络模型
 client端 主要功能：
 client通过tcp访问server，获得服务器时间。
 主要代码如下：
-int main(int argc, char **argv) { int	sockfd, n; char	recvline[MAXLINE &#43; 1]; struct sockaddr_in	servaddr; if (argc != 2) err_quit(&amp;#34;usage: a.out &amp;lt;IPaddress&amp;gt;&amp;#34;); if ( (sockfd = socket(AF_INET, SOCK_STREAM, 0)) &amp;lt; 0) err_sys(&amp;#34;socket error&amp;#34;); bzero(&amp;amp;servaddr, sizeof(servaddr)); servaddr.sin_family = AF_INET; servaddr.sin_port = htons(13);	/* daytime server */ if (inet_pton(AF_INET, argv[1], &amp;amp;servaddr.sin_addr) &amp;lt;= 0) err_quit(&amp;#34;inet_pton error for %s&amp;#34;, argv[1]); if (connect(sockfd, (SA *) &amp;amp;servaddr, sizeof(servaddr)) &amp;lt; 0) err_sys(&amp;#34;connect error&amp;#34;); while ( (n = read(sockfd, recvline, MAXLINE)) &amp;gt; 0) { recvline[n] = 0;	/* null terminate */ if (fputs(recvline, stdout) == EOF) err_sys(&amp;#34;fputs error&amp;#34;); } if (n &amp;lt; 0) err_sys(&amp;#34;read error&amp;#34;); exit(0); } 代码解析：" />
+int main(int argc, char **argv) { int	sockfd, n; char	recvline[MAXLINE &#43; 1]; struct sockaddr_in	servaddr; if (argc != 2) err_quit(&amp;#34;usage: a.out &amp;lt;IPaddress&amp;gt;&amp;#34;); if ( (sockfd = socket(AF_INET, SOCK_STREAM, 0)) &amp;lt; 0) err_sys(&amp;#34;socket error&amp;#34;); bzero(&amp;amp;servaddr, sizeof(servaddr)); servaddr.sin_family = AF_INET; servaddr.sin_port = htons(13);	/* daytime server */ if (inet_pton(AF_INET, argv[1], &amp;amp;servaddr." />
     <meta name="twitter:image" content="https://xpzouying.github.io/img/avatar.jpg" />
   
 
@@ -205,6 +207,10 @@ int main(int argc, char **argv) { int	sockfd, n; char	recvline[MAXLINE &#43; 1];
     <article class="post-content">
 
 <h1 id="tcp网络编程分析-c语言篇">TCP网络编程分析：C语言篇</h1>
+
+<p>Link:
+    - <a href="https://xpzouying.github.io/post/03_c_tcp_program/">https://xpzouying.github.io/post/03_c_tcp_program/</a>
+    - <a href="https://github.com/xpzouying/dive_into_golang/tree/master/net/tcp_time_in_c">source code in github.com/xpzouying</a></p>
 
 <p>参考《Unix Network Programming, Volume 1: The Sockets Networking API (3rd Edition)》</p>
 
