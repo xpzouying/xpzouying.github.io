@@ -277,10 +277,8 @@
 	<span class="k">return</span> <span class="kd">func</span><span class="p">(</span><span class="nx">w</span> <span class="nx">http</span><span class="p">.</span><span class="nx">ResponseWriter</span><span class="p">,</span> <span class="nx">r</span> <span class="o">*</span><span class="nx">http</span><span class="p">.</span><span class="nx">Request</span><span class="p">)</span> <span class="p">{</span>
 		<span class="nx">begin</span> <span class="o">:=</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Now</span><span class="p">()</span>
 		<span class="k">defer</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
-			<span class="nx">log</span><span class="p">.</span><span class="nx">Printf</span><span class="p">(</span><span class="s">&#34;time_used: %v&#34;</span><span class="p">,</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Now</span><span class="p">().</span><span class="nx">Sub</span><span class="p">(</span><span class="nx">begin</span><span class="p">))</span>
+			<span class="nx">log</span><span class="p">.</span><span class="nx">Printf</span><span class="p">(</span><span class="s">&#34;[%s] %s, time_used: %v&#34;</span><span class="p">,</span> <span class="nx">r</span><span class="p">.</span><span class="nx">Method</span><span class="p">,</span> <span class="nx">r</span><span class="p">.</span><span class="nx">URL</span><span class="p">.</span><span class="nx">String</span><span class="p">(),</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Now</span><span class="p">().</span><span class="nx">Sub</span><span class="p">(</span><span class="nx">begin</span><span class="p">))</span>
 		<span class="p">}()</span>
-		<span class="c1">// logging
-</span><span class="c1"></span>		<span class="nx">log</span><span class="p">.</span><span class="nx">Printf</span><span class="p">(</span><span class="nx">r</span><span class="p">.</span><span class="nx">RequestURI</span><span class="p">)</span>
 
 		<span class="nx">fn</span><span class="p">(</span><span class="nx">w</span><span class="p">,</span> <span class="nx">r</span><span class="p">)</span>
 	<span class="p">}</span>
@@ -315,10 +313,8 @@
 	<span class="k">return</span> <span class="kd">func</span><span class="p">(</span><span class="nx">w</span> <span class="nx">http</span><span class="p">.</span><span class="nx">ResponseWriter</span><span class="p">,</span> <span class="nx">r</span> <span class="o">*</span><span class="nx">http</span><span class="p">.</span><span class="nx">Request</span><span class="p">)</span> <span class="p">{</span>
 		<span class="nx">begin</span> <span class="o">:=</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Now</span><span class="p">()</span>
 		<span class="k">defer</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
-			<span class="nx">log</span><span class="p">.</span><span class="nx">Printf</span><span class="p">(</span><span class="s">&#34;time_used: %v&#34;</span><span class="p">,</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Now</span><span class="p">().</span><span class="nx">Sub</span><span class="p">(</span><span class="nx">begin</span><span class="p">))</span>
+			<span class="nx">log</span><span class="p">.</span><span class="nx">Printf</span><span class="p">(</span><span class="s">&#34;[%s] %s, time_used: %v&#34;</span><span class="p">,</span> <span class="nx">r</span><span class="p">.</span><span class="nx">Method</span><span class="p">,</span> <span class="nx">r</span><span class="p">.</span><span class="nx">URL</span><span class="p">.</span><span class="nx">String</span><span class="p">(),</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Now</span><span class="p">().</span><span class="nx">Sub</span><span class="p">(</span><span class="nx">begin</span><span class="p">))</span>
 		<span class="p">}()</span>
-		<span class="c1">// logging
-</span><span class="c1"></span>		<span class="nx">log</span><span class="p">.</span><span class="nx">Printf</span><span class="p">(</span><span class="nx">r</span><span class="p">.</span><span class="nx">RequestURI</span><span class="p">)</span>
 
 		<span class="nx">fn</span><span class="p">(</span><span class="nx">w</span><span class="p">,</span> <span class="nx">r</span><span class="p">)</span>
 	<span class="p">}</span>
@@ -330,6 +326,12 @@
 
 	<span class="nx">log</span><span class="p">.</span><span class="nx">Panic</span><span class="p">(</span><span class="nx">http</span><span class="p">.</span><span class="nx">ListenAndServe</span><span class="p">(</span><span class="s">&#34;:8080&#34;</span><span class="p">,</span> <span class="kc">nil</span><span class="p">))</span>
 <span class="p">}</span></code></pre></div>
+<p>测试</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">curl http://localhost:8080/compute
+<span class="c1"># 2017/12/13 16:57:15 [GET] /compute, time_used: 583.357048ms
+</span><span class="c1"></span>
+curl http://localhost:8080/version
+# <span class="m">2017</span>/12/13 <span class="m">16</span>:57:24 <span class="o">[</span>GET<span class="o">]</span> /version, time_used: <span class="m">47</span>.09209ms</code></pre></div>
 <h2 id="source-code-in-github-com">Source code in github.com</h2>
 
 <ul>
