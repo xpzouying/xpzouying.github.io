@@ -190,6 +190,23 @@
       
         <article class="post-entry">
   <header class="post-header">
+    <h3 class="post-title"><a href="https://xpzouying.github.io/post/06_read_file_line_by_line_in_golang/" class="post-link">06_read_line_by_line_in_golang</a></h3>
+    <p class="post-meta">@zouying · Feb 3, 2018 · 1 min read</p>
+  </header>
+  
+  <p class="post-summary">前段时间需要使用Go按行分析日志文件，比较常用的有两种方式。
+ 使用bufio.Scanner进行按行扫描；
+ 使用bufio.Reader中ReadString/ReadBytes/…一行一行读取；
+  分析日志文件250M左右大小，文件大约在250w行。
+func scanFile() { f, err := os.OpenFile(logfile, os.O_RDONLY, os.ModePerm) if err != nil { log.Fatalf(&#34;open file error: %v&#34;, err) return } defer f.Close() total := 0 // count lines  begin := time.Now() defer func() { log.Printf(&#34;scan file, time_used: %v, lines=%v\n&#34;, time.Since(begin).Seconds(), total) }() sc := bufio.NewScanner(f) for sc.Scan() { _ = sc.Text() total&#43;&#43; } if err := sc.Err(); err != nil { log.</p>
+  <footer class="post-footer">
+    <a class="read-more" href="https://xpzouying.github.io/post/06_read_file_line_by_line_in_golang/">Read More →</a>
+  </footer>
+</article>
+
+      
+        <article class="post-entry">
+  <header class="post-header">
     <h3 class="post-title"><a href="https://xpzouying.github.io/post/05_middleware_in_golang/" class="post-link">Web service middleware in Golang</a></h3>
     <p class="post-meta">@zouying · Dec 11, 2017 · 2 min read</p>
   </header>

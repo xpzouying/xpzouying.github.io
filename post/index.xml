@@ -7,10 +7,23 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
     <copyright>© This post is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License，please give source if you likes to quote or reproduce.</copyright>
-    <lastBuildDate>Mon, 11 Dec 2017 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 03 Feb 2018 17:44:05 +0800</lastBuildDate>
     
 	<atom:link href="https://xpzouying.github.io/post/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>06_read_line_by_line_in_golang</title>
+      <link>https://xpzouying.github.io/post/06_read_file_line_by_line_in_golang/</link>
+      <pubDate>Sat, 03 Feb 2018 17:44:05 +0800</pubDate>
+      
+      <guid>https://xpzouying.github.io/post/06_read_file_line_by_line_in_golang/</guid>
+      <description>前段时间需要使用Go按行分析日志文件，比较常用的有两种方式。
+ 使用bufio.Scanner进行按行扫描；
+ 使用bufio.Reader中ReadString/ReadBytes/&amp;hellip;一行一行读取；
+  分析日志文件250M左右大小，文件大约在250w行。
+func scanFile() { f, err := os.OpenFile(logfile, os.O_RDONLY, os.ModePerm) if err != nil { log.Fatalf(&amp;#34;open file error: %v&amp;#34;, err) return } defer f.Close() total := 0 // count lines  begin := time.Now() defer func() { log.Printf(&amp;#34;scan file, time_used: %v, lines=%v\n&amp;#34;, time.Since(begin).Seconds(), total) }() sc := bufio.NewScanner(f) for sc.Scan() { _ = sc.Text() total++ } if err := sc.Err(); err != nil { log.</description>
+    </item>
     
     <item>
       <title>Basic of Interview</title>
