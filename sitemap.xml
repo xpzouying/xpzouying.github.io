@@ -13,31 +13,6 @@
   </url>
   
   <url>
-    <loc>https://xpzouying.github.io/post/06_read_file_line_by_line_in_golang/</loc>
-    <lastmod>2018-02-03T17:44:05+08:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://xpzouying.github.io/post/04_interview/</loc>
-    <lastmod>2017-12-11T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://xpzouying.github.io/post/05_middleware_in_golang/</loc>
-    <lastmod>2017-12-11T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://xpzouying.github.io/post/03_c_tcp_program/</loc>
-    <lastmod>2017-11-28T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://xpzouying.github.io/post/02_dive_into_golang_io_writer/</loc>
-    <lastmod>2017-11-25T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
     <loc>https://xpzouying.github.io/post/my-first-post/</loc>
     <lastmod>2017-11-24T00:00:00+00:00</lastmod>
   </url>
@@ -54,20 +29,13 @@
   </url>
   
   <url>
-    <loc>https://xpzouying.github.io/tags/golang/</loc>
-    <lastmod>2017-11-25T00:00:00+00:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
     <loc>https://xpzouying.github.io/post/</loc>
-    <lastmod>2018-02-03T17:44:05+08:00</lastmod>
+    <lastmod>2017-11-24T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>https://xpzouying.github.io/tags/</loc>
-    <lastmod>2017-11-25T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
