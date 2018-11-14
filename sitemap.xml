@@ -8,18 +8,37 @@
   </url>
   
   <url>
-    <loc>https://xpzouying.github.io/about/</loc>
-    <lastmod>2017-11-24T15:42:32+08:00</lastmod>
+    <loc>https://xpzouying.github.io/post/reading_notebook_201811/</loc>
+    <lastmod>2018-11-14T09:23:24+08:00</lastmod>
   </url>
   
   <url>
-    <loc>https://xpzouying.github.io/post/reading_notebook/</loc>
-    <lastmod>2018-08-14T10:25:52+08:00</lastmod>
+    <loc>https://xpzouying.github.io/post/reading_notebook_201810/</loc>
+    <lastmod>2018-11-14T09:23:24+08:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://xpzouying.github.io/post/reading_notebook_201808/</loc>
+    <lastmod>2018-11-14T09:23:24+08:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://xpzouying.github.io/post/reading_notebook_201809/</loc>
+    <lastmod>2018-11-14T09:23:24+08:00</lastmod>
   </url>
   
   <url>
     <loc>https://xpzouying.github.io/post/my-first-post/</loc>
     <lastmod>2017-11-24T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://xpzouying.github.io/about/desc/</loc>
+  </url>
+  
+  <url>
+    <loc>https://xpzouying.github.io/about/</loc>
+    <priority>0</priority>
   </url>
   
   <url>
@@ -34,13 +53,32 @@
   </url>
   
   <url>
+    <loc>https://xpzouying.github.io/tags/life/</loc>
+    <lastmod>2018-11-14T09:23:24+08:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://xpzouying.github.io/categories/life/</loc>
+    <lastmod>2018-11-14T09:23:24+08:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
     <loc>https://xpzouying.github.io/post/</loc>
-    <lastmod>2018-08-14T10:25:52+08:00</lastmod>
+    <lastmod>2018-11-14T09:23:24+08:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://xpzouying.github.io/tags/reading/</loc>
+    <lastmod>2018-11-14T09:23:24+08:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>https://xpzouying.github.io/tags/</loc>
+    <lastmod>2018-11-14T09:23:24+08:00</lastmod>
     <priority>0</priority>
   </url>
   
