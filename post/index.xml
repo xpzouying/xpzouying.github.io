@@ -7,10 +7,42 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cmn-Hans</language>
     <copyright>© This post is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License，please give source if you likes to quote or reproduce.</copyright>
-    <lastBuildDate>Wed, 14 Nov 2018 09:23:24 +0800</lastBuildDate>
+    <lastBuildDate>Mon, 19 Nov 2018 23:14:17 +0800</lastBuildDate>
     
 	<atom:link href="https://xpzouying.github.io/post/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Dive Into HTTP Router in Golang</title>
+      <link>https://xpzouying.github.io/post/dive_into_http_router_01/</link>
+      <pubDate>Mon, 19 Nov 2018 23:14:17 +0800</pubDate>
+      
+      <guid>https://xpzouying.github.io/post/dive_into_http_router_01/</guid>
+      <description>&lt;h1 id=&#34;golang默认的http-router&#34;&gt;golang默认的http router&lt;/h1&gt;
+
+&lt;p&gt;我们从Golang的http router开始学习，学习下面几点：&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;分析什么是router&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;解析Go内部是如何实现router&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;分析为什么Go内部已经有了router后还会出现各种个样的router，他们提供了哪些Go内部router不能完成的功能&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;我们如何实现一个自定义的router&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;我们如何在自定义的router上面完成我们想要的各种功能：高效率、Middleware、异常捕获及处理、如何简单的完成JSON类型的返回等等&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;</description>
+    </item>
+    
+    <item>
+      <title>Dive Into Code</title>
+      <link>https://xpzouying.github.io/post/dive_into_src_plan/</link>
+      <pubDate>Mon, 19 Nov 2018 09:44:58 +0800</pubDate>
+      
+      <guid>https://xpzouying.github.io/post/dive_into_src_plan/</guid>
+      <description>&lt;p&gt;之前制定了阅读计划，每天阅读25页书。&lt;/p&gt;</description>
+    </item>
     
     <item>
       <title>2018年11月阅读记录</title>
@@ -18,9 +50,7 @@
       <pubDate>Wed, 14 Nov 2018 09:23:24 +0800</pubDate>
       
       <guid>https://xpzouying.github.io/post/reading_notebook_201811/</guid>
-      <description>&lt;p&gt;Habit One: reading&lt;/p&gt;
-
-&lt;p&gt;&lt;/p&gt;</description>
+      <description>&lt;p&gt;Habit One: reading&lt;/p&gt;</description>
     </item>
     
     <item>
@@ -29,9 +59,7 @@
       <pubDate>Tue, 14 Aug 2018 10:25:52 +0800</pubDate>
       
       <guid>https://xpzouying.github.io/post/reading_notebook_201810/</guid>
-      <description>&lt;p&gt;Habit One: reading&lt;/p&gt;
-
-&lt;p&gt;&lt;/p&gt;</description>
+      <description>&lt;p&gt;Habit One: reading&lt;/p&gt;</description>
     </item>
     
     <item>
@@ -40,9 +68,7 @@
       <pubDate>Tue, 14 Aug 2018 10:25:52 +0800</pubDate>
       
       <guid>https://xpzouying.github.io/post/reading_notebook_201808/</guid>
-      <description>&lt;p&gt;Habit One: reading&lt;/p&gt;
-
-&lt;p&gt;&lt;/p&gt;</description>
+      <description>&lt;p&gt;Habit One: reading&lt;/p&gt;</description>
     </item>
     
     <item>
@@ -51,9 +77,7 @@
       <pubDate>Tue, 14 Aug 2018 10:25:52 +0800</pubDate>
       
       <guid>https://xpzouying.github.io/post/reading_notebook_201809/</guid>
-      <description>&lt;p&gt;Habit One: reading&lt;/p&gt;
-
-&lt;p&gt;&lt;/p&gt;</description>
+      <description>&lt;p&gt;Habit One: reading&lt;/p&gt;</description>
     </item>
     
     <item>
