@@ -22,6 +22,17 @@
     </item>
     
     <item>
+      <title>Dive_into_http_router_02</title>
+      <link>https://xpzouying.github.io/post/dive_into_http_router_02/</link>
+      <pubDate>Tue, 20 Nov 2018 23:54:30 +0800</pubDate>
+      
+      <guid>https://xpzouying.github.io/post/dive_into_http_router_02/</guid>
+      <description>&lt;h1 id=&#34;day-2&#34;&gt;Day 2&lt;/h1&gt;
+
+&lt;p&gt;http注册一个http处理函数的过程为：&lt;/p&gt;</description>
+    </item>
+    
+    <item>
       <title>Dive Into HTTP Router in Golang</title>
       <link>https://xpzouying.github.io/post/dive_into_http_router_01/</link>
       <pubDate>Mon, 19 Nov 2018 23:14:17 +0800</pubDate>
