@@ -56,7 +56,7 @@
       <header>
         <h1 class="ui header">
           Dive_into_http_router_02
-          <div class="sub header">@ zouying · Nov 20, 2018 · 7 min read · 更新于 Nov 20, 2018</div>
+          <div class="sub header">@ zouying · Nov 20, 2018 · 11 min read · 更新于 Nov 20, 2018</div>
         </h1>
       </header>
       <article class="post-content" style="margin-top: 2rem; font-size: 1.4rem;"><h1 id="day-2">Day 2</h1>
@@ -234,40 +234,11 @@
 	<span class="nx">c</span><span class="p">.</span><span class="nx">remoteAddr</span> <span class="p">=</span> <span class="nx">c</span><span class="p">.</span><span class="nx">rwc</span><span class="p">.</span><span class="nx">RemoteAddr</span><span class="p">().</span><span class="nx">String</span><span class="p">()</span>
 	<span class="nx">ctx</span> <span class="p">=</span> <span class="nx">context</span><span class="p">.</span><span class="nx">WithValue</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span> <span class="nx">LocalAddrContextKey</span><span class="p">,</span> <span class="nx">c</span><span class="p">.</span><span class="nx">rwc</span><span class="p">.</span><span class="nx">LocalAddr</span><span class="p">())</span>
 	<span class="k">defer</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
-		<span class="k">if</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nb">recover</span><span class="p">();</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="o">&amp;&amp;</span> <span class="nx">err</span> <span class="o">!=</span> <span class="nx">ErrAbortHandler</span> <span class="p">{</span>
-			<span class="kd">const</span> <span class="nx">size</span> <span class="p">=</span> <span class="mi">64</span> <span class="o">&lt;&lt;</span> <span class="mi">10</span>
-			<span class="nx">buf</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">([]</span><span class="kt">byte</span><span class="p">,</span> <span class="nx">size</span><span class="p">)</span>
-			<span class="nx">buf</span> <span class="p">=</span> <span class="nx">buf</span><span class="p">[:</span><span class="nx">runtime</span><span class="p">.</span><span class="nx">Stack</span><span class="p">(</span><span class="nx">buf</span><span class="p">,</span> <span class="kc">false</span><span class="p">)]</span>
-			<span class="nx">c</span><span class="p">.</span><span class="nx">server</span><span class="p">.</span><span class="nx">logf</span><span class="p">(</span><span class="s">&#34;http: panic serving %v: %v\n%s&#34;</span><span class="p">,</span> <span class="nx">c</span><span class="p">.</span><span class="nx">remoteAddr</span><span class="p">,</span> <span class="nx">err</span><span class="p">,</span> <span class="nx">buf</span><span class="p">)</span>
-		<span class="p">}</span>
-		<span class="k">if</span> <span class="p">!</span><span class="nx">c</span><span class="p">.</span><span class="nx">hijacked</span><span class="p">()</span> <span class="p">{</span>
-			<span class="nx">c</span><span class="p">.</span><span class="nb">close</span><span class="p">()</span>
-			<span class="nx">c</span><span class="p">.</span><span class="nx">setState</span><span class="p">(</span><span class="nx">c</span><span class="p">.</span><span class="nx">rwc</span><span class="p">,</span> <span class="nx">StateClosed</span><span class="p">)</span>
-		<span class="p">}</span>
-	<span class="p">}()</span>
+		<span class="c1">// 异常panic处理
+</span><span class="c1"></span>	<span class="p">}()</span>
 
-	<span class="k">if</span> <span class="nx">tlsConn</span><span class="p">,</span> <span class="nx">ok</span> <span class="o">:=</span> <span class="nx">c</span><span class="p">.</span><span class="nx">rwc</span><span class="p">.(</span><span class="o">*</span><span class="nx">tls</span><span class="p">.</span><span class="nx">Conn</span><span class="p">);</span> <span class="nx">ok</span> <span class="p">{</span>
-		<span class="k">if</span> <span class="nx">d</span> <span class="o">:=</span> <span class="nx">c</span><span class="p">.</span><span class="nx">server</span><span class="p">.</span><span class="nx">ReadTimeout</span><span class="p">;</span> <span class="nx">d</span> <span class="o">!=</span> <span class="mi">0</span> <span class="p">{</span>
-			<span class="nx">c</span><span class="p">.</span><span class="nx">rwc</span><span class="p">.</span><span class="nx">SetReadDeadline</span><span class="p">(</span><span class="nx">time</span><span class="p">.</span><span class="nx">Now</span><span class="p">().</span><span class="nx">Add</span><span class="p">(</span><span class="nx">d</span><span class="p">))</span>
-		<span class="p">}</span>
-		<span class="k">if</span> <span class="nx">d</span> <span class="o">:=</span> <span class="nx">c</span><span class="p">.</span><span class="nx">server</span><span class="p">.</span><span class="nx">WriteTimeout</span><span class="p">;</span> <span class="nx">d</span> <span class="o">!=</span> <span class="mi">0</span> <span class="p">{</span>
-			<span class="nx">c</span><span class="p">.</span><span class="nx">rwc</span><span class="p">.</span><span class="nx">SetWriteDeadline</span><span class="p">(</span><span class="nx">time</span><span class="p">.</span><span class="nx">Now</span><span class="p">().</span><span class="nx">Add</span><span class="p">(</span><span class="nx">d</span><span class="p">))</span>
-		<span class="p">}</span>
-		<span class="k">if</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">tlsConn</span><span class="p">.</span><span class="nx">Handshake</span><span class="p">();</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
-			<span class="nx">c</span><span class="p">.</span><span class="nx">server</span><span class="p">.</span><span class="nx">logf</span><span class="p">(</span><span class="s">&#34;http: TLS handshake error from %s: %v&#34;</span><span class="p">,</span> <span class="nx">c</span><span class="p">.</span><span class="nx">rwc</span><span class="p">.</span><span class="nx">RemoteAddr</span><span class="p">(),</span> <span class="nx">err</span><span class="p">)</span>
-			<span class="k">return</span>
-		<span class="p">}</span>
-		<span class="nx">c</span><span class="p">.</span><span class="nx">tlsState</span> <span class="p">=</span> <span class="nb">new</span><span class="p">(</span><span class="nx">tls</span><span class="p">.</span><span class="nx">ConnectionState</span><span class="p">)</span>
-		<span class="o">*</span><span class="nx">c</span><span class="p">.</span><span class="nx">tlsState</span> <span class="p">=</span> <span class="nx">tlsConn</span><span class="p">.</span><span class="nx">ConnectionState</span><span class="p">()</span>
-		<span class="k">if</span> <span class="nx">proto</span> <span class="o">:=</span> <span class="nx">c</span><span class="p">.</span><span class="nx">tlsState</span><span class="p">.</span><span class="nx">NegotiatedProtocol</span><span class="p">;</span> <span class="nx">validNPN</span><span class="p">(</span><span class="nx">proto</span><span class="p">)</span> <span class="p">{</span>
-			<span class="k">if</span> <span class="nx">fn</span> <span class="o">:=</span> <span class="nx">c</span><span class="p">.</span><span class="nx">server</span><span class="p">.</span><span class="nx">TLSNextProto</span><span class="p">[</span><span class="nx">proto</span><span class="p">];</span> <span class="nx">fn</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
-				<span class="nx">h</span> <span class="o">:=</span> <span class="nx">initNPNRequest</span><span class="p">{</span><span class="nx">tlsConn</span><span class="p">,</span> <span class="nx">serverHandler</span><span class="p">{</span><span class="nx">c</span><span class="p">.</span><span class="nx">server</span><span class="p">}}</span>
-				<span class="nx">fn</span><span class="p">(</span><span class="nx">c</span><span class="p">.</span><span class="nx">server</span><span class="p">,</span> <span class="nx">tlsConn</span><span class="p">,</span> <span class="nx">h</span><span class="p">)</span>
-			<span class="p">}</span>
-			<span class="k">return</span>
-		<span class="p">}</span>
-	<span class="p">}</span>
-
+	<span class="c1">// ... tls相关的处理
+</span><span class="c1"></span>
 	<span class="c1">// HTTP/1.x from here on.
 </span><span class="c1"></span>
 	<span class="nx">ctx</span><span class="p">,</span> <span class="nx">cancelCtx</span> <span class="o">:=</span> <span class="nx">context</span><span class="p">.</span><span class="nx">WithCancel</span><span class="p">(</span><span class="nx">ctx</span><span class="p">)</span>
@@ -280,57 +251,8 @@
 
 	<span class="k">for</span> <span class="p">{</span>
 		<span class="nx">w</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">c</span><span class="p">.</span><span class="nx">readRequest</span><span class="p">(</span><span class="nx">ctx</span><span class="p">)</span>
-		<span class="k">if</span> <span class="nx">c</span><span class="p">.</span><span class="nx">r</span><span class="p">.</span><span class="nx">remain</span> <span class="o">!=</span> <span class="nx">c</span><span class="p">.</span><span class="nx">server</span><span class="p">.</span><span class="nx">initialReadLimitSize</span><span class="p">()</span> <span class="p">{</span>
-			<span class="c1">// If we read any bytes off the wire, we&#39;re active.
-</span><span class="c1"></span>			<span class="nx">c</span><span class="p">.</span><span class="nx">setState</span><span class="p">(</span><span class="nx">c</span><span class="p">.</span><span class="nx">rwc</span><span class="p">,</span> <span class="nx">StateActive</span><span class="p">)</span>
-		<span class="p">}</span>
-		<span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
-			<span class="kd">const</span> <span class="nx">errorHeaders</span> <span class="p">=</span> <span class="s">&#34;\r\nContent-Type: text/plain; charset=utf-8\r\nConnection: close\r\n\r\n&#34;</span>
-
-			<span class="k">if</span> <span class="nx">err</span> <span class="o">==</span> <span class="nx">errTooLarge</span> <span class="p">{</span>
-				<span class="c1">// Their HTTP client may or may not be
-</span><span class="c1"></span>				<span class="c1">// able to read this if we&#39;re
-</span><span class="c1"></span>				<span class="c1">// responding to them and hanging up
-</span><span class="c1"></span>				<span class="c1">// while they&#39;re still writing their
-</span><span class="c1"></span>				<span class="c1">// request. Undefined behavior.
-</span><span class="c1"></span>				<span class="kd">const</span> <span class="nx">publicErr</span> <span class="p">=</span> <span class="s">&#34;431 Request Header Fields Too Large&#34;</span>
-				<span class="nx">fmt</span><span class="p">.</span><span class="nx">Fprintf</span><span class="p">(</span><span class="nx">c</span><span class="p">.</span><span class="nx">rwc</span><span class="p">,</span> <span class="s">&#34;HTTP/1.1 &#34;</span><span class="o">+</span><span class="nx">publicErr</span><span class="o">+</span><span class="nx">errorHeaders</span><span class="o">+</span><span class="nx">publicErr</span><span class="p">)</span>
-				<span class="nx">c</span><span class="p">.</span><span class="nx">closeWriteAndWait</span><span class="p">()</span>
-				<span class="k">return</span>
-			<span class="p">}</span>
-			<span class="k">if</span> <span class="nx">isCommonNetReadError</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="p">{</span>
-				<span class="k">return</span> <span class="c1">// don&#39;t reply
-</span><span class="c1"></span>			<span class="p">}</span>
-
-			<span class="nx">publicErr</span> <span class="o">:=</span> <span class="s">&#34;400 Bad Request&#34;</span>
-			<span class="k">if</span> <span class="nx">v</span><span class="p">,</span> <span class="nx">ok</span> <span class="o">:=</span> <span class="nx">err</span><span class="p">.(</span><span class="nx">badRequestError</span><span class="p">);</span> <span class="nx">ok</span> <span class="p">{</span>
-				<span class="nx">publicErr</span> <span class="p">=</span> <span class="nx">publicErr</span> <span class="o">+</span> <span class="s">&#34;: &#34;</span> <span class="o">+</span> <span class="nb">string</span><span class="p">(</span><span class="nx">v</span><span class="p">)</span>
-			<span class="p">}</span>
-
-			<span class="nx">fmt</span><span class="p">.</span><span class="nx">Fprintf</span><span class="p">(</span><span class="nx">c</span><span class="p">.</span><span class="nx">rwc</span><span class="p">,</span> <span class="s">&#34;HTTP/1.1 &#34;</span><span class="o">+</span><span class="nx">publicErr</span><span class="o">+</span><span class="nx">errorHeaders</span><span class="o">+</span><span class="nx">publicErr</span><span class="p">)</span>
-			<span class="k">return</span>
-		<span class="p">}</span>
-
-		<span class="c1">// Expect 100 Continue support
-</span><span class="c1"></span>		<span class="nx">req</span> <span class="o">:=</span> <span class="nx">w</span><span class="p">.</span><span class="nx">req</span>
-		<span class="k">if</span> <span class="nx">req</span><span class="p">.</span><span class="nx">expectsContinue</span><span class="p">()</span> <span class="p">{</span>
-			<span class="k">if</span> <span class="nx">req</span><span class="p">.</span><span class="nx">ProtoAtLeast</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="nx">req</span><span class="p">.</span><span class="nx">ContentLength</span> <span class="o">!=</span> <span class="mi">0</span> <span class="p">{</span>
-				<span class="c1">// Wrap the Body reader with one that replies on the connection
-</span><span class="c1"></span>				<span class="nx">req</span><span class="p">.</span><span class="nx">Body</span> <span class="p">=</span> <span class="o">&amp;</span><span class="nx">expectContinueReader</span><span class="p">{</span><span class="nx">readCloser</span><span class="p">:</span> <span class="nx">req</span><span class="p">.</span><span class="nx">Body</span><span class="p">,</span> <span class="nx">resp</span><span class="p">:</span> <span class="nx">w</span><span class="p">}</span>
-			<span class="p">}</span>
-		<span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="nx">req</span><span class="p">.</span><span class="nx">Header</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s">&#34;Expect&#34;</span><span class="p">)</span> <span class="o">!=</span> <span class="s">&#34;&#34;</span> <span class="p">{</span>
-			<span class="nx">w</span><span class="p">.</span><span class="nx">sendExpectationFailed</span><span class="p">()</span>
-			<span class="k">return</span>
-		<span class="p">}</span>
-
-		<span class="nx">c</span><span class="p">.</span><span class="nx">curReq</span><span class="p">.</span><span class="nx">Store</span><span class="p">(</span><span class="nx">w</span><span class="p">)</span>
-
-		<span class="k">if</span> <span class="nx">requestBodyRemains</span><span class="p">(</span><span class="nx">req</span><span class="p">.</span><span class="nx">Body</span><span class="p">)</span> <span class="p">{</span>
-			<span class="nx">registerOnHitEOF</span><span class="p">(</span><span class="nx">req</span><span class="p">.</span><span class="nx">Body</span><span class="p">,</span> <span class="nx">w</span><span class="p">.</span><span class="nx">conn</span><span class="p">.</span><span class="nx">r</span><span class="p">.</span><span class="nx">startBackgroundRead</span><span class="p">)</span>
-		<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-			<span class="nx">w</span><span class="p">.</span><span class="nx">conn</span><span class="p">.</span><span class="nx">r</span><span class="p">.</span><span class="nx">startBackgroundRead</span><span class="p">()</span>
-		<span class="p">}</span>
-
+		<span class="c1">// ...
+</span><span class="c1"></span>
 		<span class="c1">// HTTP cannot have multiple simultaneous active requests.[*]
 </span><span class="c1"></span>		<span class="c1">// Until the server replies to this request, it can&#39;t read another,
 </span><span class="c1"></span>		<span class="c1">// so we might as well run the handler in this goroutine.
@@ -339,38 +261,197 @@
 </span><span class="c1"></span>		<span class="c1">// But we&#39;re not going to implement HTTP pipelining because it
 </span><span class="c1"></span>		<span class="c1">// was never deployed in the wild and the answer is HTTP/2.
 </span><span class="c1"></span>		<span class="nx">serverHandler</span><span class="p">{</span><span class="nx">c</span><span class="p">.</span><span class="nx">server</span><span class="p">}.</span><span class="nx">ServeHTTP</span><span class="p">(</span><span class="nx">w</span><span class="p">,</span> <span class="nx">w</span><span class="p">.</span><span class="nx">req</span><span class="p">)</span>
-		<span class="nx">w</span><span class="p">.</span><span class="nx">cancelCtx</span><span class="p">()</span>
-		<span class="k">if</span> <span class="nx">c</span><span class="p">.</span><span class="nx">hijacked</span><span class="p">()</span> <span class="p">{</span>
-			<span class="k">return</span>
-		<span class="p">}</span>
-		<span class="nx">w</span><span class="p">.</span><span class="nx">finishRequest</span><span class="p">()</span>
-		<span class="k">if</span> <span class="p">!</span><span class="nx">w</span><span class="p">.</span><span class="nx">shouldReuseConnection</span><span class="p">()</span> <span class="p">{</span>
-			<span class="k">if</span> <span class="nx">w</span><span class="p">.</span><span class="nx">requestBodyLimitHit</span> <span class="o">||</span> <span class="nx">w</span><span class="p">.</span><span class="nx">closedRequestBodyEarly</span><span class="p">()</span> <span class="p">{</span>
-				<span class="nx">c</span><span class="p">.</span><span class="nx">closeWriteAndWait</span><span class="p">()</span>
-			<span class="p">}</span>
-			<span class="k">return</span>
-		<span class="p">}</span>
-		<span class="nx">c</span><span class="p">.</span><span class="nx">setState</span><span class="p">(</span><span class="nx">c</span><span class="p">.</span><span class="nx">rwc</span><span class="p">,</span> <span class="nx">StateIdle</span><span class="p">)</span>
-		<span class="nx">c</span><span class="p">.</span><span class="nx">curReq</span><span class="p">.</span><span class="nx">Store</span><span class="p">((</span><span class="o">*</span><span class="nx">response</span><span class="p">)(</span><span class="kc">nil</span><span class="p">))</span>
-
-		<span class="k">if</span> <span class="p">!</span><span class="nx">w</span><span class="p">.</span><span class="nx">conn</span><span class="p">.</span><span class="nx">server</span><span class="p">.</span><span class="nx">doKeepAlives</span><span class="p">()</span> <span class="p">{</span>
-			<span class="c1">// We&#39;re in shutdown mode. We might&#39;ve replied
-</span><span class="c1"></span>			<span class="c1">// to the user without &#34;Connection: close&#34; and
-</span><span class="c1"></span>			<span class="c1">// they might think they can send another
-</span><span class="c1"></span>			<span class="c1">// request, but such is life with HTTP/1.1.
-</span><span class="c1"></span>			<span class="k">return</span>
-		<span class="p">}</span>
-
-		<span class="k">if</span> <span class="nx">d</span> <span class="o">:=</span> <span class="nx">c</span><span class="p">.</span><span class="nx">server</span><span class="p">.</span><span class="nx">idleTimeout</span><span class="p">();</span> <span class="nx">d</span> <span class="o">!=</span> <span class="mi">0</span> <span class="p">{</span>
-			<span class="nx">c</span><span class="p">.</span><span class="nx">rwc</span><span class="p">.</span><span class="nx">SetReadDeadline</span><span class="p">(</span><span class="nx">time</span><span class="p">.</span><span class="nx">Now</span><span class="p">().</span><span class="nx">Add</span><span class="p">(</span><span class="nx">d</span><span class="p">))</span>
-			<span class="k">if</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">c</span><span class="p">.</span><span class="nx">bufr</span><span class="p">.</span><span class="nx">Peek</span><span class="p">(</span><span class="mi">4</span><span class="p">);</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
-				<span class="k">return</span>
-			<span class="p">}</span>
-		<span class="p">}</span>
-		<span class="nx">c</span><span class="p">.</span><span class="nx">rwc</span><span class="p">.</span><span class="nx">SetReadDeadline</span><span class="p">(</span><span class="nx">time</span><span class="p">.</span><span class="nx">Time</span><span class="p">{})</span>
-	<span class="p">}</span>
+		<span class="c1">// ...
+</span><span class="c1"></span>	<span class="p">}</span>
 <span class="p">}</span></code></pre></div>
-<p>TODO(zouying): 分析上面这段代码，如何serve一个连接。</p></article>
+<p>首先conn对于对于<code>c.r</code>进行封装成<code>connReader</code>，这个就是一个io.Reader的一个封装实现。<code>connReader</code>在Read的时候，做了一些特殊的处理。这里暂时跳过。</p>
+
+<p>c.bufr就是一个带缓存的Reader，下面其实就是用了bufio.Reader来封装。另外这里的缓存使用了sync.Pool来保存cache，这里可以看到底层的源码使用了很多技巧。sync.Pool我在百度工作的时候，因为需要处理的业务量较大，集群200w QPS，单台4-5w QPS，当时也在很多地方用来sync.Pool和bytes.Buffer做性能优化。</p>
+
+<blockquote>
+<p>另外需要在这里说一些自己的感悟，如果我自己之前没有做过对性能优化相关的工作的话，那么我自己看这段源码可能也是一扫而过，知道在这里用了sync.Pool，但是sync.Pool到底起到什么作用（避免频繁分配内存导致的性能下降），可能从根本上还是没有那么透彻，看来技能还是得多多打磨。</p>
+</blockquote>
+
+<p>接着分析是，使用for循环一直从conn中读出请求，然后进行处理。从代码猜的是，看来请求并不是一次都能读取完毕，可能会多次读取。</p>
+
+<p>在这里出现了把我们最初定义的server封装成一个<code>serverHandler</code>的类型，该类型其实就是一个server的Handler或者DefaultServeMux，在serverHandler的<code>ServeHTTP(w, w.req)</code>函数定义如下，</p>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="p">(</span><span class="nx">sh</span> <span class="nx">serverHandler</span><span class="p">)</span> <span class="nx">ServeHTTP</span><span class="p">(</span><span class="nx">rw</span> <span class="nx">ResponseWriter</span><span class="p">,</span> <span class="nx">req</span> <span class="o">*</span><span class="nx">Request</span><span class="p">)</span> <span class="p">{</span>
+	<span class="nx">handler</span> <span class="o">:=</span> <span class="nx">sh</span><span class="p">.</span><span class="nx">srv</span><span class="p">.</span><span class="nx">Handler</span>
+	<span class="k">if</span> <span class="nx">handler</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+		<span class="nx">handler</span> <span class="p">=</span> <span class="nx">DefaultServeMux</span>
+	<span class="p">}</span>
+	<span class="k">if</span> <span class="nx">req</span><span class="p">.</span><span class="nx">RequestURI</span> <span class="o">==</span> <span class="s">&#34;*&#34;</span> <span class="o">&amp;&amp;</span> <span class="nx">req</span><span class="p">.</span><span class="nx">Method</span> <span class="o">==</span> <span class="s">&#34;OPTIONS&#34;</span> <span class="p">{</span>
+		<span class="nx">handler</span> <span class="p">=</span> <span class="nx">globalOptionsHandler</span><span class="p">{}</span>
+	<span class="p">}</span>
+	<span class="nx">handler</span><span class="p">.</span><span class="nx">ServeHTTP</span><span class="p">(</span><span class="nx">rw</span><span class="p">,</span> <span class="nx">req</span><span class="p">)</span>
+<span class="p">}</span></code></pre></div>
+<p>可以在这里面看到，如果我们最开始的时候，server中的Handler如果是nil的话，就使用默认的DefaultServeMux。</p>
+
+<p>我们在demo中，使用<code>http.ListenAndServe(&quot;:8080&quot;, nil)</code>启动服务时，第二个参数就是nil，所以我们在demo中，用到的就是默认的DefaultServeMux。</p>
+
+<p>那么最后当调用<code>handler.ServeHTTP(rw, req)</code>时，DefaultServeMux.ServeHTTP会如何处理这些请求呢？</p>
+
+<p>我们可以看到DefaultServeMux的定义是：</p>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// DefaultServeMux is the default ServeMux used by Serve.
+</span><span class="c1"></span><span class="kd">var</span> <span class="nx">DefaultServeMux</span> <span class="p">=</span> <span class="o">&amp;</span><span class="nx">defaultServeMux</span>
+
+<span class="kd">var</span> <span class="nx">defaultServeMux</span> <span class="nx">ServeMux</span></code></pre></div>
+<p>其中<code>ServeMux</code>的定义是：</p>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">type</span> <span class="nx">ServeMux</span> <span class="kd">struct</span> <span class="p">{</span>
+	<span class="nx">mu</span>    <span class="nx">sync</span><span class="p">.</span><span class="nx">RWMutex</span>
+	<span class="nx">m</span>     <span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="nx">muxEntry</span>
+	<span class="nx">hosts</span> <span class="kt">bool</span> <span class="c1">// whether any patterns contain hostnames
+</span><span class="c1"></span><span class="p">}</span></code></pre></div>
+<p>我们这样就找到之前所解释的<code>ServeMux</code>的调用的地方了，也就是我们终于找到了我们想要分析的路由router的入口点了。</p>
+
+<p>那么我们继续分析ServeMux.ServeHTTP都是如何做的。</p>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// ServeHTTP dispatches the request to the handler whose
+</span><span class="c1">// pattern most closely matches the request URL.
+</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">mux</span> <span class="o">*</span><span class="nx">ServeMux</span><span class="p">)</span> <span class="nx">ServeHTTP</span><span class="p">(</span><span class="nx">w</span> <span class="nx">ResponseWriter</span><span class="p">,</span> <span class="nx">r</span> <span class="o">*</span><span class="nx">Request</span><span class="p">)</span> <span class="p">{</span>
+	<span class="c1">// ...
+</span><span class="c1"></span>	<span class="nx">h</span><span class="p">,</span> <span class="nx">_</span> <span class="o">:=</span> <span class="nx">mux</span><span class="p">.</span><span class="nx">Handler</span><span class="p">(</span><span class="nx">r</span><span class="p">)</span>
+	<span class="nx">h</span><span class="p">.</span><span class="nx">ServeHTTP</span><span class="p">(</span><span class="nx">w</span><span class="p">,</span> <span class="nx">r</span><span class="p">)</span>
+<span class="p">}</span></code></pre></div>
+<p>啊哈，起码从注释中，我们可以看到ServeHTTP是把请求分发给最适配的处理函数。</p>
+
+<p>这就是我们要分析的关键所在。</p>
+
+<p>重点在于最后两句：</p>
+
+<ol>
+<li><code>h, _ := mux.Handler(r)</code>：返回一个Handler（Handler的定义是：A Handler responds to an HTTP request.），Handler就是对HTTP请求进行处理并作出返回的函数。</li>
+</ol>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// Handler returns the handler to use for the given request,
+</span><span class="c1">// consulting r.Method, r.Host, and r.URL.Path. It always returns
+</span><span class="c1">// a non-nil handler. 
+</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">mux</span> <span class="o">*</span><span class="nx">ServeMux</span><span class="p">)</span> <span class="nx">Handler</span><span class="p">(</span><span class="nx">r</span> <span class="o">*</span><span class="nx">Request</span><span class="p">)</span> <span class="p">(</span><span class="nx">h</span> <span class="nx">Handler</span><span class="p">,</span> <span class="nx">pattern</span> <span class="kt">string</span><span class="p">)</span> <span class="p">{</span>
+	<span class="c1">// ...
+</span><span class="c1"></span>	<span class="k">return</span> <span class="nx">mux</span><span class="p">.</span><span class="nx">handler</span><span class="p">(</span><span class="nx">host</span><span class="p">,</span> <span class="nx">r</span><span class="p">.</span><span class="nx">URL</span><span class="p">.</span><span class="nx">Path</span><span class="p">)</span>
+<span class="p">}</span></code></pre></div>
+<p>我们暂时不考虑HTTP CONNECT METHOD，剩下的主要的是<code>mux.handler(host, r.URL.Path)</code>。</p>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// handler is the main implementation of Handler.
+</span><span class="c1">// The path is known to be in canonical form, except for CONNECT methods.
+</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">mux</span> <span class="o">*</span><span class="nx">ServeMux</span><span class="p">)</span> <span class="nx">handler</span><span class="p">(</span><span class="nx">host</span><span class="p">,</span> <span class="nx">path</span> <span class="kt">string</span><span class="p">)</span> <span class="p">(</span><span class="nx">h</span> <span class="nx">Handler</span><span class="p">,</span> <span class="nx">pattern</span> <span class="kt">string</span><span class="p">)</span> <span class="p">{</span>
+	<span class="nx">mux</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nx">RLock</span><span class="p">()</span>
+	<span class="k">defer</span> <span class="nx">mux</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nx">RUnlock</span><span class="p">()</span>
+
+	<span class="c1">// Host-specific pattern takes precedence over generic ones
+</span><span class="c1"></span>	<span class="k">if</span> <span class="nx">mux</span><span class="p">.</span><span class="nx">hosts</span> <span class="p">{</span>
+		<span class="nx">h</span><span class="p">,</span> <span class="nx">pattern</span> <span class="p">=</span> <span class="nx">mux</span><span class="p">.</span><span class="nx">match</span><span class="p">(</span><span class="nx">host</span> <span class="o">+</span> <span class="nx">path</span><span class="p">)</span>
+	<span class="p">}</span>
+	<span class="k">if</span> <span class="nx">h</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+		<span class="nx">h</span><span class="p">,</span> <span class="nx">pattern</span> <span class="p">=</span> <span class="nx">mux</span><span class="p">.</span><span class="nx">match</span><span class="p">(</span><span class="nx">path</span><span class="p">)</span>
+	<span class="p">}</span>
+	<span class="k">if</span> <span class="nx">h</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+		<span class="nx">h</span><span class="p">,</span> <span class="nx">pattern</span> <span class="p">=</span> <span class="nx">NotFoundHandler</span><span class="p">(),</span> <span class="s">&#34;&#34;</span>
+	<span class="p">}</span>
+	<span class="k">return</span>
+<span class="p">}</span></code></pre></div>
+<p>做了下面操作，</p>
+
+<ol>
+<li><p>看mux中有没有指定hosts需要匹配满足的，如果需要，那么查找的时候，在路径前面添加host，这个host是请求的Host。如果找到匹配的Handler，那么返回该Handler。</p></li>
+
+<li><p>如果第1步没有找到。则去掉host，查找是否有匹配的Handler，如果有，返回。</p></li>
+
+<li><p>如果没有匹配的，那么返回一个特殊的Handler——NotFoundHandler()，该Handler的定义如下，也就是往Response中写入404。</p></li>
+</ol>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// NotFound replies to the request with an HTTP 404 not found error.
+</span><span class="c1"></span><span class="kd">func</span> <span class="nx">NotFound</span><span class="p">(</span><span class="nx">w</span> <span class="nx">ResponseWriter</span><span class="p">,</span> <span class="nx">r</span> <span class="o">*</span><span class="nx">Request</span><span class="p">)</span> <span class="p">{</span> <span class="nx">Error</span><span class="p">(</span><span class="nx">w</span><span class="p">,</span> <span class="s">&#34;404 page not found&#34;</span><span class="p">,</span> <span class="nx">StatusNotFound</span><span class="p">)</span> <span class="p">}</span>
+
+<span class="c1">// NotFoundHandler returns a simple request handler
+</span><span class="c1">// that replies to each request with a ``404 page not found&#39;&#39; reply.
+</span><span class="c1"></span><span class="kd">func</span> <span class="nx">NotFoundHandler</span><span class="p">()</span> <span class="nx">Handler</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">HandlerFunc</span><span class="p">(</span><span class="nx">NotFound</span><span class="p">)</span> <span class="p">}</span></code></pre></div>
+<p>我们往下分析path匹配的函数，<code>h, pattern = mux.match(path)</code></p>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// Find a handler on a handler map given a path string.
+</span><span class="c1">// Most-specific (longest) pattern wins.
+</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">mux</span> <span class="o">*</span><span class="nx">ServeMux</span><span class="p">)</span> <span class="nx">match</span><span class="p">(</span><span class="nx">path</span> <span class="kt">string</span><span class="p">)</span> <span class="p">(</span><span class="nx">h</span> <span class="nx">Handler</span><span class="p">,</span> <span class="nx">pattern</span> <span class="kt">string</span><span class="p">)</span> <span class="p">{</span>
+	<span class="c1">// Check for exact match first.
+</span><span class="c1"></span>	<span class="nx">v</span><span class="p">,</span> <span class="nx">ok</span> <span class="o">:=</span> <span class="nx">mux</span><span class="p">.</span><span class="nx">m</span><span class="p">[</span><span class="nx">path</span><span class="p">]</span>
+	<span class="k">if</span> <span class="nx">ok</span> <span class="p">{</span>
+		<span class="k">return</span> <span class="nx">v</span><span class="p">.</span><span class="nx">h</span><span class="p">,</span> <span class="nx">v</span><span class="p">.</span><span class="nx">pattern</span>
+	<span class="p">}</span>
+
+	<span class="c1">// Check for longest valid match.
+</span><span class="c1"></span>	<span class="kd">var</span> <span class="nx">n</span> <span class="p">=</span> <span class="mi">0</span>
+	<span class="k">for</span> <span class="nx">k</span><span class="p">,</span> <span class="nx">v</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">mux</span><span class="p">.</span><span class="nx">m</span> <span class="p">{</span>
+		<span class="k">if</span> <span class="p">!</span><span class="nx">pathMatch</span><span class="p">(</span><span class="nx">k</span><span class="p">,</span> <span class="nx">path</span><span class="p">)</span> <span class="p">{</span>
+			<span class="k">continue</span>
+		<span class="p">}</span>
+		<span class="k">if</span> <span class="nx">h</span> <span class="o">==</span> <span class="kc">nil</span> <span class="o">||</span> <span class="nb">len</span><span class="p">(</span><span class="nx">k</span><span class="p">)</span> <span class="p">&gt;</span> <span class="nx">n</span> <span class="p">{</span>
+			<span class="nx">n</span> <span class="p">=</span> <span class="nb">len</span><span class="p">(</span><span class="nx">k</span><span class="p">)</span>
+			<span class="nx">h</span> <span class="p">=</span> <span class="nx">v</span><span class="p">.</span><span class="nx">h</span>
+			<span class="nx">pattern</span> <span class="p">=</span> <span class="nx">v</span><span class="p">.</span><span class="nx">pattern</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+	<span class="k">return</span>
+<span class="p">}</span></code></pre></div>
+<p>从mux中，也即默认的DefaultServeMux，注册Handler map表中搜索，根据一个符合的返回。如果有多个handler都符合，那么返回path匹配最长路径的handler。</p>
+
+<blockquote>
+<p>在这里我们可以看到http默认的mux是不区分http方法的，所以只要路径满足，不管request method是get、post、delete，都是会进入到同一个Handler中。</p>
+</blockquote>
+
+<p>我们回顾到上面调用处理函数的地方，</p>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// ServeHTTP dispatches the request to the handler whose
+</span><span class="c1">// pattern most closely matches the request URL.
+</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">mux</span> <span class="o">*</span><span class="nx">ServeMux</span><span class="p">)</span> <span class="nx">ServeHTTP</span><span class="p">(</span><span class="nx">w</span> <span class="nx">ResponseWriter</span><span class="p">,</span> <span class="nx">r</span> <span class="o">*</span><span class="nx">Request</span><span class="p">)</span> <span class="p">{</span>
+	<span class="c1">// ...
+</span><span class="c1"></span>	<span class="nx">h</span><span class="p">,</span> <span class="nx">_</span> <span class="o">:=</span> <span class="nx">mux</span><span class="p">.</span><span class="nx">Handler</span><span class="p">(</span><span class="nx">r</span><span class="p">)</span>
+	<span class="nx">h</span><span class="p">.</span><span class="nx">ServeHTTP</span><span class="p">(</span><span class="nx">w</span><span class="p">,</span> <span class="nx">r</span><span class="p">)</span>
+<span class="p">}</span></code></pre></div>
+<p>我们从mux中获取到了一个Handler h，我们是使用<code>h.ServeHTTP(w, r)</code>来调用我们定义的请求处理函数。</p>
+
+<p>我们定义的请求处理函数原型是：<code>func fooHandler(w http.ResponseWriter, r *http.Request)</code></p>
+
+<p>并且Handler interface的定义也是下面这样，</p>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">type</span> <span class="nx">Handler</span> <span class="kd">interface</span> <span class="p">{</span>
+	<span class="nx">ServeHTTP</span><span class="p">(</span><span class="nx">ResponseWriter</span><span class="p">,</span> <span class="o">*</span><span class="nx">Request</span><span class="p">)</span>
+<span class="p">}</span></code></pre></div>
+<p>也要求Handler，也即是我们的处理函数需要满足：ServeHTTP(ResponseWriter, *Request)，然而我们的函数并没有定义ServeHTTP函数，这是怎么一回事？</p>
+
+<p>奇妙之处就在于注册的时候，</p>
+
+<p>当我们用<code>http.HandleFunc(&quot;/foo&quot;, fooHandler)</code>注册时，</p>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="nx">HandleFunc</span><span class="p">(</span><span class="nx">pattern</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">handler</span> <span class="kd">func</span><span class="p">(</span><span class="nx">ResponseWriter</span><span class="p">,</span> <span class="o">*</span><span class="nx">Request</span><span class="p">))</span> <span class="p">{</span>
+	<span class="nx">DefaultServeMux</span><span class="p">.</span><span class="nx">HandleFunc</span><span class="p">(</span><span class="nx">pattern</span><span class="p">,</span> <span class="nx">handler</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="c1">// HandleFunc registers the handler function for the given pattern.
+</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">mux</span> <span class="o">*</span><span class="nx">ServeMux</span><span class="p">)</span> <span class="nx">HandleFunc</span><span class="p">(</span><span class="nx">pattern</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">handler</span> <span class="kd">func</span><span class="p">(</span><span class="nx">ResponseWriter</span><span class="p">,</span> <span class="o">*</span><span class="nx">Request</span><span class="p">))</span> <span class="p">{</span>
+	<span class="c1">// ...
+</span><span class="c1"></span>	<span class="nx">mux</span><span class="p">.</span><span class="nx">Handle</span><span class="p">(</span><span class="nx">pattern</span><span class="p">,</span> <span class="nx">HandlerFunc</span><span class="p">(</span><span class="nx">handler</span><span class="p">))</span>
+<span class="p">}</span></code></pre></div>
+<p>在HandleFunc中，会把我们自定义的handler（也就是fooHandler）强制类型转换为<code>HandlerFunc(handler)</code>。</p>
+
+<p>而HandlerFunc的定义如下，</p>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// The HandlerFunc type is an adapter to allow the use of
+</span><span class="c1">// ordinary functions as HTTP handlers. If f is a function
+</span><span class="c1">// with the appropriate signature, HandlerFunc(f) is a
+</span><span class="c1">// Handler that calls f.
+</span><span class="c1"></span><span class="kd">type</span> <span class="nx">HandlerFunc</span> <span class="kd">func</span><span class="p">(</span><span class="nx">ResponseWriter</span><span class="p">,</span> <span class="o">*</span><span class="nx">Request</span><span class="p">)</span>
+
+<span class="c1">// ServeHTTP calls f(w, r).
+</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">f</span> <span class="nx">HandlerFunc</span><span class="p">)</span> <span class="nx">ServeHTTP</span><span class="p">(</span><span class="nx">w</span> <span class="nx">ResponseWriter</span><span class="p">,</span> <span class="nx">r</span> <span class="o">*</span><span class="nx">Request</span><span class="p">)</span> <span class="p">{</span>
+	<span class="nx">f</span><span class="p">(</span><span class="nx">w</span><span class="p">,</span> <span class="nx">r</span><span class="p">)</span>
+<span class="p">}</span></code></pre></div>
+<p>HandlerFunc就是为了适配自定义的函数为标准的Handler。</p>
+
+<hr />
+
+<p>前面的流程串一下就是：</p>
+
+<ol>
+<li><p>我们启动服务并监听一个地址，等待请求</p></li>
+
+<li><p>当来了一个请求后，我们会启动一个goroutine对这个请求进行处理</p></li>
+
+<li><p>处理的这个请求的方式，也即我们是怎么查找这个请求的对应的处理函数是根据Handler.ServeHTTP来规定的，这个也就是我们要找的router。</p></li>
+
+<li><p>由于我们没有定义自己的router，所以我们使用了默认的DefaultServeMux</p></li>
+
+<li><p>从DefaultServeMux注册的所有Handler中，找出最合适Handler进行处理（匹配且路径最长）</p></li>
+</ol></article>
     </section>
 
     <footer class="ui secondary attached segment dream-tags">
