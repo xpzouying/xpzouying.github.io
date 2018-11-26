@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>zouying.is</title>
+
+  
+  
+  <meta name="author" content="zouying" />
+  <meta name="description" content="上一次分析了默认的http server以及router的工作方式。 本文开始解析beego的router过程。
+
+" />
+
+
+
+
+
+<meta name="generator" content="Hugo 0.50" />
+
+
+<link rel="canonical" href="https://xpzouying.github.io/post/dive_into_beego_router/" />
+<link rel="alternative" href="https://xpzouying.github.io/index.xml" title="zouying.is" type="application/atom+xml" />
+
+<link href="https://cdn.bootcss.com/semantic-ui/2.2.14/semantic.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="https://xpzouying.github.io/css/site.css" />
+
+
+</head>
+
+<body>
+  <div class="flip-container">
+    <div class="flipper">
+      <section class="front">
+        
+<nav class="ui top secondary menu">
+  <div class="item">
+    <i class="inverted big link bullseye icon dream-flip-toggle" title="翻转！"></i>
+  </div>
+  <div class="item">
+    <a href="https://xpzouying.github.io/">
+      <i class="inverted big link home icon" title="首页"></i>
+    </a>
+  </div>
+</nav>
+ 
+<div class="ui centered grid">
+  <div class="fifteen wide mobile fifteen wide tablet eleven wide computer column post-list post-single-main">
+
+    <section class="ui secondary top attached black segment">
+      <a class="ui black right corner label" href="javascript:void(0)" onclick="savePostAsImg()">
+        <i class="save icon"></i>
+      </a>
+      <header>
+        <h1 class="ui header">
+          Dive Into beego/router
+          <div class="sub header">@ zouying · Nov 26, 2018 · 6 min read · 更新于 Nov 26, 2018</div>
+        </h1>
+      </header>
+      <article class="post-content" style="margin-top: 2rem; font-size: 1.4rem;"><p>上一次分析了默认的http server以及router的工作方式。
+本文开始解析beego的router过程。</p>
+
+<p></p>
+
+<p>具体参见：</p>
+
+<ul>
+<li><a href="https://github.com/xpzouying/dive_into_golang/tree/master/net/http_router">Dive into golang: http router</a></li>
+</ul>
+
+<p>从今天开始分析国人创建的一个非常有名的web框架——<a href="https://github.com/astaxie/beego">beego</a>。</p>
+
+<p>从github主页的hello world开始，</p>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kn">package</span> <span class="nx">main</span>
+
+<span class="kn">import</span> <span class="s">&#34;github.com/astaxie/beego&#34;</span>
+
+<span class="kd">func</span> <span class="nx">main</span><span class="p">(){</span>
+    <span class="nx">beego</span><span class="p">.</span><span class="nx">Run</span><span class="p">()</span>
+<span class="p">}</span></code></pre></div>
+<p>Build and run</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">go build hello.go
+./hello</code></pre></div>
+<p>打开浏览器，访问<code>http://localhost:8080</code>，得到了</p>
+
+<p><img src="images/beego_router_1.jpg" alt="beego_router_1.jpg" /></p>
+
+<p>从之前对于默认的http router可以推测到beego对于查找不到的路由handler也会进行默认的处理，与go默认的不同是，</p>
+
+<p>默认的只是返回一个404错误和一个字符串，&rdquo;404 page not found&rdquo;。</p>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// NotFound replies to the request with an HTTP 404 not found error.
+</span><span class="c1"></span><span class="kd">func</span> <span class="nx">NotFound</span><span class="p">(</span><span class="nx">w</span> <span class="nx">ResponseWriter</span><span class="p">,</span> <span class="nx">r</span> <span class="o">*</span><span class="nx">Request</span><span class="p">)</span> <span class="p">{</span> <span class="nx">Error</span><span class="p">(</span><span class="nx">w</span><span class="p">,</span> <span class="s">&#34;404 page not found&#34;</span><span class="p">,</span> <span class="nx">StatusNotFound</span><span class="p">)</span> <span class="p">}</span>
+
+<span class="c1">// NotFoundHandler returns a simple request handler
+</span><span class="c1">// that replies to each request with a ``404 page not found&#39;&#39; reply.
+</span><span class="c1"></span><span class="kd">func</span> <span class="nx">NotFoundHandler</span><span class="p">()</span> <span class="nx">Handler</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">HandlerFunc</span><span class="p">(</span><span class="nx">NotFound</span><span class="p">)</span> <span class="p">}</span></code></pre></div>
+<p>而beego会返回一个HTML页面。</p>
+
+<p>具体的是如何实现的，我们后面分析代码的时候会追踪到。</p>
+
+<p>首先分析<code>beego.Run()</code>，看看beego.Run()在做什么？</p>
+
+<blockquote>
+<p>猜测：
+beego.Run()在底层至少包括下面两步：
+1. 创建了默认的router，其中包括一个NotFoundHandler来处理404错误；从上一次分析http router可以得知，
+router肯定会满足http中的ServeHTTP interface，这样才能满足对应的Handler规范。
+2. 启动HTTP service，监听socket地址，当接收到请求的时候，调用对应的handler进行处理；</p>
+</blockquote>
+
+<p>下面分析源码：</p>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// Run beego application.
+</span><span class="c1">// beego.Run() default run on HttpPort
+</span><span class="c1">// beego.Run(&#34;localhost&#34;)
+</span><span class="c1">// beego.Run(&#34;:8089&#34;)
+</span><span class="c1">// beego.Run(&#34;127.0.0.1:8089&#34;)
+</span><span class="c1"></span><span class="kd">func</span> <span class="nx">Run</span><span class="p">(</span><span class="nx">params</span> <span class="o">...</span><span class="kt">string</span><span class="p">)</span> <span class="p">{</span>
+
+	<span class="nx">initBeforeHTTPRun</span><span class="p">()</span>
+    <span class="c1">// ...
+</span><span class="c1"></span>	<span class="nx">BeeApp</span><span class="p">.</span><span class="nx">Run</span><span class="p">()</span>
+<span class="p">}</span></code></pre></div>
+<p>主要包括两部分：</p>
+
+<ol>
+<li><p><code>initBeforeHTTPRun()</code></p></li>
+
+<li><p><code>BeeApp.Run()</code></p></li>
+</ol>
+
+<p>先看第1部分，在运行http server之前做了一些行为的处理。深入进去看看都是做了什么？</p>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="nx">initBeforeHTTPRun</span><span class="p">()</span> <span class="p">{</span>
+	<span class="c1">//init hooks
+</span><span class="c1"></span>	<span class="nx">AddAPPStartHook</span><span class="p">(</span>
+		<span class="nx">registerMime</span><span class="p">,</span>
+		<span class="nx">registerDefaultErrorHandler</span><span class="p">,</span>
+		<span class="nx">registerSession</span><span class="p">,</span>
+		<span class="nx">registerTemplate</span><span class="p">,</span>
+		<span class="nx">registerAdmin</span><span class="p">,</span>
+		<span class="nx">registerGzip</span><span class="p">,</span>
+	<span class="p">)</span>
+
+	<span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">hk</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">hooks</span> <span class="p">{</span>
+		<span class="k">if</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">hk</span><span class="p">();</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+			<span class="nb">panic</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+<span class="p">}</span></code></pre></div>
+<p>做了一大堆的hook，这些hook是什么呢？从后面for循环中可以看出是一个接口规范，在启动前会注册一大堆的参数或者配置，
+其中有一个<code>registerDefaultErrorHandler</code>，应该就是我们要找的404页面的Handler处理函数。</p>
+
+<p>我们以这个处理函数的hook为例，看看都在http server运行前都在做什么？</p>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// register default error http handlers, 404,401,403,500 and 503.
+</span><span class="c1"></span><span class="kd">func</span> <span class="nx">registerDefaultErrorHandler</span><span class="p">()</span> <span class="kt">error</span> <span class="p">{</span>
+	<span class="nx">m</span> <span class="o">:=</span> <span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kd">func</span><span class="p">(</span><span class="nx">http</span><span class="p">.</span><span class="nx">ResponseWriter</span><span class="p">,</span> <span class="o">*</span><span class="nx">http</span><span class="p">.</span><span class="nx">Request</span><span class="p">){</span>
+		<span class="s">&#34;401&#34;</span><span class="p">:</span> <span class="nx">unauthorized</span><span class="p">,</span>
+		<span class="s">&#34;402&#34;</span><span class="p">:</span> <span class="nx">paymentRequired</span><span class="p">,</span>
+		<span class="s">&#34;403&#34;</span><span class="p">:</span> <span class="nx">forbidden</span><span class="p">,</span>
+		<span class="s">&#34;404&#34;</span><span class="p">:</span> <span class="nx">notFound</span><span class="p">,</span>
+		<span class="s">&#34;405&#34;</span><span class="p">:</span> <span class="nx">methodNotAllowed</span><span class="p">,</span>
+		<span class="s">&#34;500&#34;</span><span class="p">:</span> <span class="nx">internalServerError</span><span class="p">,</span>
+		<span class="s">&#34;501&#34;</span><span class="p">:</span> <span class="nx">notImplemented</span><span class="p">,</span>
+		<span class="s">&#34;502&#34;</span><span class="p">:</span> <span class="nx">badGateway</span><span class="p">,</span>
+		<span class="s">&#34;503&#34;</span><span class="p">:</span> <span class="nx">serviceUnavailable</span><span class="p">,</span>
+		<span class="s">&#34;504&#34;</span><span class="p">:</span> <span class="nx">gatewayTimeout</span><span class="p">,</span>
+		<span class="s">&#34;417&#34;</span><span class="p">:</span> <span class="nx">invalidxsrf</span><span class="p">,</span>
+		<span class="s">&#34;422&#34;</span><span class="p">:</span> <span class="nx">missingxsrf</span><span class="p">,</span>
+	<span class="p">}</span>
+	<span class="k">for</span> <span class="nx">e</span><span class="p">,</span> <span class="nx">h</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">m</span> <span class="p">{</span>
+		<span class="k">if</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">ok</span> <span class="o">:=</span> <span class="nx">ErrorMaps</span><span class="p">[</span><span class="nx">e</span><span class="p">];</span> <span class="p">!</span><span class="nx">ok</span> <span class="p">{</span>
+			<span class="nx">ErrorHandler</span><span class="p">(</span><span class="nx">e</span><span class="p">,</span> <span class="nx">h</span><span class="p">)</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+	<span class="k">return</span> <span class="kc">nil</span>
+<span class="p">}</span></code></pre></div>
+<p>为4xx、5xx做了预先定义了一大堆的http HandleFunc，我们还是看我们的404错误的处理函数：notFound，</p>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// show 404 not found error.
+</span><span class="c1"></span><span class="kd">func</span> <span class="nx">notFound</span><span class="p">(</span><span class="nx">rw</span> <span class="nx">http</span><span class="p">.</span><span class="nx">ResponseWriter</span><span class="p">,</span> <span class="nx">r</span> <span class="o">*</span><span class="nx">http</span><span class="p">.</span><span class="nx">Request</span><span class="p">)</span> <span class="p">{</span>
+	<span class="nx">responseError</span><span class="p">(</span><span class="nx">rw</span><span class="p">,</span> <span class="nx">r</span><span class="p">,</span>
+		<span class="mi">404</span><span class="p">,</span>
+		<span class="s">&#34;&lt;br&gt;The page you have requested has flown the coop.&#34;</span><span class="o">+</span>
+			<span class="s">&#34;&lt;br&gt;Perhaps you are here because:&#34;</span><span class="o">+</span>
+			<span class="s">&#34;&lt;br&gt;&lt;br&gt;&lt;ul&gt;&#34;</span><span class="o">+</span>
+			<span class="s">&#34;&lt;br&gt;The page has moved&#34;</span><span class="o">+</span>
+			<span class="s">&#34;&lt;br&gt;The page no longer exists&#34;</span><span class="o">+</span>
+			<span class="s">&#34;&lt;br&gt;You were looking for your puppy and got lost&#34;</span><span class="o">+</span>
+			<span class="s">&#34;&lt;br&gt;You like 404 pages&#34;</span><span class="o">+</span>
+			<span class="s">&#34;&lt;/ul&gt;&#34;</span><span class="p">,</span>
+	<span class="p">)</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="nx">responseError</span><span class="p">(</span><span class="nx">rw</span> <span class="nx">http</span><span class="p">.</span><span class="nx">ResponseWriter</span><span class="p">,</span> <span class="nx">r</span> <span class="o">*</span><span class="nx">http</span><span class="p">.</span><span class="nx">Request</span><span class="p">,</span> <span class="nx">errCode</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">errContent</span> <span class="kt">string</span><span class="p">)</span> <span class="p">{</span>
+	<span class="nx">t</span><span class="p">,</span> <span class="nx">_</span> <span class="o">:=</span> <span class="nx">template</span><span class="p">.</span><span class="nx">New</span><span class="p">(</span><span class="s">&#34;beegoerrortemp&#34;</span><span class="p">).</span><span class="nx">Parse</span><span class="p">(</span><span class="nx">errtpl</span><span class="p">)</span>
+	<span class="nx">data</span> <span class="o">:=</span> <span class="nx">M</span><span class="p">{</span>
+		<span class="s">&#34;Title&#34;</span><span class="p">:</span>        <span class="nx">http</span><span class="p">.</span><span class="nx">StatusText</span><span class="p">(</span><span class="nx">errCode</span><span class="p">),</span>
+		<span class="s">&#34;BeegoVersion&#34;</span><span class="p">:</span> <span class="nx">VERSION</span><span class="p">,</span>
+		<span class="s">&#34;Content&#34;</span><span class="p">:</span>      <span class="nx">template</span><span class="p">.</span><span class="nx">HTML</span><span class="p">(</span><span class="nx">errContent</span><span class="p">),</span>
+	<span class="p">}</span>
+	<span class="nx">t</span><span class="p">.</span><span class="nx">Execute</span><span class="p">(</span><span class="nx">rw</span><span class="p">,</span> <span class="nx">data</span><span class="p">)</span>
+<span class="p">}</span></code></pre></div>
+<p>首先按照HandleFunc interface的规范，定义了<code>notFound</code>的处理函数，这个函数使用template库渲染了html页面。</p>
+
+<p>我们最开始打开的404页面就是由该处理函数进行渲染得到的。</p>
+
+<p>在<code>registerDefaultErrorHandler</code>中其他的错误处理函数也是类似，使用http template渲染了不同的html页面。</p>
+
+<p>下面这段for循环代码，是刚才那一堆默认的error handler注册到ErrorMaps上面。如果用户定义了自己的错误处理函数，那么使用用户自己定义的，否则使用beego自带的。</p>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go">	<span class="k">for</span> <span class="nx">e</span><span class="p">,</span> <span class="nx">h</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">m</span> <span class="p">{</span>
+		<span class="k">if</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">ok</span> <span class="o">:=</span> <span class="nx">ErrorMaps</span><span class="p">[</span><span class="nx">e</span><span class="p">];</span> <span class="p">!</span><span class="nx">ok</span> <span class="p">{</span> <span class="c1">// 如果用户没有定义，则使用beego自带的错误处理函数
+</span><span class="c1"></span>			<span class="nx">ErrorHandler</span><span class="p">(</span><span class="nx">e</span><span class="p">,</span> <span class="nx">h</span><span class="p">)</span>
+		<span class="p">}</span>
+	<span class="p">}</span></code></pre></div>
+<p><code>ErrorMaps</code>是什么呢？</p>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// ErrorMaps holds map of http handlers for each error string.
+</span><span class="c1">// there is 10 kinds default error(40x and 50x)
+</span><span class="c1"></span><span class="kd">var</span> <span class="nx">ErrorMaps</span> <span class="p">=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="o">*</span><span class="nx">errorInfo</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+
+<span class="c1">// ErrorHandler registers http.HandlerFunc to each http err code string.
+</span><span class="c1">// usage:
+</span><span class="c1">// 	beego.ErrorHandler(&#34;404&#34;,NotFound)
+</span><span class="c1">//	beego.ErrorHandler(&#34;500&#34;,InternalServerError)
+</span><span class="c1"></span><span class="kd">func</span> <span class="nx">ErrorHandler</span><span class="p">(</span><span class="nx">code</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">h</span> <span class="nx">http</span><span class="p">.</span><span class="nx">HandlerFunc</span><span class="p">)</span> <span class="o">*</span><span class="nx">App</span> <span class="p">{</span>
+	<span class="nx">ErrorMaps</span><span class="p">[</span><span class="nx">code</span><span class="p">]</span> <span class="p">=</span> <span class="o">&amp;</span><span class="nx">errorInfo</span><span class="p">{</span>
+		<span class="nx">errorType</span><span class="p">:</span> <span class="nx">errorTypeHandler</span><span class="p">,</span>
+		<span class="nx">handler</span><span class="p">:</span>   <span class="nx">h</span><span class="p">,</span>
+		<span class="nx">method</span><span class="p">:</span>    <span class="nx">code</span><span class="p">,</span>
+	<span class="p">}</span>
+	<span class="k">return</span> <span class="nx">BeeApp</span>
+<span class="p">}</span></code></pre></div>
+<p>ErrorMaps是一个默认的查找错误的处理函数的表，这也是router mux的一部分，只是它专门用来查找错误的HandleFunc。</p>
+
+<p>ErrorHandler函数在注册完后，返回一个BeeApp，其类型为<code>*App</code>，看起来BeeApp就是咱们要找的默认的http server以及handler集合了。</p>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">var</span> <span class="p">(</span>
+	<span class="c1">// BeeApp is an application instance
+</span><span class="c1"></span>	<span class="nx">BeeApp</span> <span class="o">*</span><span class="nx">App</span>
+<span class="p">)</span>
+
+<span class="c1">// App defines beego application with a new PatternServeMux.
+</span><span class="c1"></span><span class="kd">type</span> <span class="nx">App</span> <span class="kd">struct</span> <span class="p">{</span>
+	<span class="nx">Handlers</span> <span class="o">*</span><span class="nx">ControllerRegister</span>
+	<span class="nx">Server</span>   <span class="o">*</span><span class="nx">http</span><span class="p">.</span><span class="nx">Server</span>
+<span class="p">}</span></code></pre></div>
+<p>再分析其他的Hook都是干什么？大部分暂时跳过，我们主要是要找到运行的原理，暂时不纠结细节处理。</p>
+
+<ul>
+<li><p><code>registerMime</code>：注册一大堆的文件与文件在HTTP Header上Content-Type对应关系，比如<code>&quot;.json&quot;</code>注册为<code>&quot;application/json&quot;</code>。</p></li>
+
+<li><p><code>registerDefaultErrorHandler</code>：注册错误的处理函数</p></li>
+
+<li><p><code>registerSession</code>：跳过。</p></li>
+
+<li><p><code>registerTemplate</code>：跳过。</p></li>
+
+<li><p><code>registerAdmin</code>：跳过。</p></li>
+
+<li><p><code>registerGzip</code>：跳过。</p></li>
+</ul>
+
+<p>接下来看看初始化完后，http service是如何启动并且找到对应的handler的？</p>
+
+<p>重点看BeeApp，App struct中包括两个，</p>
+
+<ol>
+<li><p><code>Handlers *ControllerRegister</code></p></li>
+
+<li><p><code>Server   *http.Server</code></p></li>
+</ol>
+
+<p><code>BeeApp.Run()</code>启动后，</p>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// MiddleWare function for http.Handler
+</span><span class="c1"></span><span class="kd">type</span> <span class="nx">MiddleWare</span> <span class="kd">func</span><span class="p">(</span><span class="nx">http</span><span class="p">.</span><span class="nx">Handler</span><span class="p">)</span> <span class="nx">http</span><span class="p">.</span><span class="nx">Handler</span>
+
+<span class="c1">// Run beego application.
+</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">app</span> <span class="o">*</span><span class="nx">App</span><span class="p">)</span> <span class="nx">Run</span><span class="p">(</span><span class="nx">mws</span> <span class="o">...</span><span class="nx">MiddleWare</span><span class="p">)</span> <span class="p">{</span>
+	<span class="nx">addr</span> <span class="o">:=</span> <span class="nx">BConfig</span><span class="p">.</span><span class="nx">Listen</span><span class="p">.</span><span class="nx">HTTPAddr</span>
+
+	<span class="k">if</span> <span class="nx">BConfig</span><span class="p">.</span><span class="nx">Listen</span><span class="p">.</span><span class="nx">HTTPPort</span> <span class="o">!=</span> <span class="mi">0</span> <span class="p">{</span>
+		<span class="nx">addr</span> <span class="p">=</span> <span class="nx">fmt</span><span class="p">.</span><span class="nx">Sprintf</span><span class="p">(</span><span class="s">&#34;%s:%d&#34;</span><span class="p">,</span> <span class="nx">BConfig</span><span class="p">.</span><span class="nx">Listen</span><span class="p">.</span><span class="nx">HTTPAddr</span><span class="p">,</span> <span class="nx">BConfig</span><span class="p">.</span><span class="nx">Listen</span><span class="p">.</span><span class="nx">HTTPPort</span><span class="p">)</span>
+	<span class="p">}</span>
+
+	<span class="kd">var</span> <span class="p">(</span>
+		<span class="nx">err</span>        <span class="kt">error</span>
+		<span class="nx">l</span>          <span class="nx">net</span><span class="p">.</span><span class="nx">Listener</span>
+		<span class="nx">endRunning</span> <span class="p">=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">chan</span> <span class="kt">bool</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+	<span class="p">)</span>
+    <span class="c1">// ...
+</span><span class="c1"></span>	<span class="k">if</span> <span class="nx">BConfig</span><span class="p">.</span><span class="nx">Listen</span><span class="p">.</span><span class="nx">EnableHTTP</span> <span class="p">{</span>
+		<span class="k">go</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+			<span class="nx">app</span><span class="p">.</span><span class="nx">Server</span><span class="p">.</span><span class="nx">Addr</span> <span class="p">=</span> <span class="nx">addr</span>
+			<span class="nx">logs</span><span class="p">.</span><span class="nx">Info</span><span class="p">(</span><span class="s">&#34;http server Running on http://%s&#34;</span><span class="p">,</span> <span class="nx">app</span><span class="p">.</span><span class="nx">Server</span><span class="p">.</span><span class="nx">Addr</span><span class="p">)</span>
+			<span class="k">if</span> <span class="nx">BConfig</span><span class="p">.</span><span class="nx">Listen</span><span class="p">.</span><span class="nx">ListenTCP4</span> <span class="p">{</span>
+				<span class="nx">ln</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">net</span><span class="p">.</span><span class="nx">Listen</span><span class="p">(</span><span class="s">&#34;tcp4&#34;</span><span class="p">,</span> <span class="nx">app</span><span class="p">.</span><span class="nx">Server</span><span class="p">.</span><span class="nx">Addr</span><span class="p">)</span>
+				<span class="c1">// ...
+</span><span class="c1"></span>				<span class="k">if</span> <span class="nx">err</span> <span class="p">=</span> <span class="nx">app</span><span class="p">.</span><span class="nx">Server</span><span class="p">.</span><span class="nx">Serve</span><span class="p">(</span><span class="nx">ln</span><span class="p">);</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+					<span class="c1">// ...
+</span><span class="c1"></span>					<span class="nx">endRunning</span> <span class="o">&lt;-</span> <span class="kc">true</span>
+					<span class="k">return</span>
+				<span class="p">}</span>
+			<span class="p">}</span> <span class="c1">// ...
+</span><span class="c1"></span>		<span class="p">}()</span>
+	<span class="p">}</span>
+	<span class="o">&lt;-</span><span class="nx">endRunning</span>
+<span class="p">}</span></code></pre></div>
+<p>暂时跳过MiddleWare相关，后面专门分析MiddleWare相关知识点。</p>
+
+<p>我们查看普通的http模式，进入到<code>if BConfig.Listen.EnableHTTP</code>分支，并且我们假设仅仅监听tcp ipv4，而不监听ipv6。</p>
+
+<p>在这里面起了一个goroutine运行，然后在整个函数的最后使用endRunning的channel等待goroutine的工作完毕。</p>
+
+<p>goroutine中做了什么事情？</p>
+
+<ol>
+<li><p>使用net.Listen做了一个tcp v4的监听；</p></li>
+
+<li><p>使用app中的Server对这个连接进行处理(Serve)；Serve会从监听的listen接收到进来的请求，然后创建一个新的goroutine去执行。在goroutine中，服务器端会读取request的信息，并且找到对应的srv.Handler去处理请求。</p></li>
+</ol>
+
+<blockquote>
+<p>TODO：
+不清楚为什么在Run()里面需要起一个goroutine来接收/处理请求。
+我的感觉是不需要用goroutine，也不需要endRunning channel来阻塞。在Serve(ln)中，已经包括一个for的死循环了，程序不会结束退出。</p>
+</blockquote></article>
+    </section>
+
+    <footer class="ui secondary attached segment dream-tags">
+      
+      
+      <a class="ui label" href="https://xpzouying.github.io/tags/code" title="code">code</a>
+      
+      
+    </footer>
+
+    
+    <footer class="ui secondary attached segment">
+      © This post is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License，please give source if you likes to quote or reproduce.
+    </footer>
+    
+
+    
+
+  </div>
+  <div class="fifteen wide mobile fifteen wide tablet four wide computer column">
+
+    <section class="ui top attached center aligned inverted segment">
+  <div class="ui small circular image">
+    
+    <img src="https://xpzouying.github.io/img/avatar.jpg">
+    
+  </div>
+  <h3 class="ui header">zouying的博客<div class="sub header" style="color: white;">我们都生活在阴沟里，但仍有人仰望星空</div>
+  </h3>
+
+  <div class="ui inverted horizontal list">
+    
+    <a class="item" href="https://xpzouying.github.io/post">
+      <i class="archive icon" title="归档"></i>
+    </a>
+    
+    <a class="item" href="https://xpzouying.github.io/tags">
+      <i class="tags icon" title="所有标签"></i>
+    </a>
+    <a class="item" href="https://xpzouying.github.io/categories">
+      <i class="inverted cubes icon" title="所有分类"></i>
+    </a>
+  </div>
+
+  <a id="tag-category-pop" class="ui red right corner label">
+    <i class="pointing down icon" title="点击弹出标签和分类"></i>
+  </a>
+</section>
+
+
+<section class="ui attached center aligned inverted segment dream-header-tags dream-tags">
+  
+  <a class="ui label" href="https://xpzouying.github.io/tags/code" title="code">code</a>
+  
+  <a class="ui label" href="https://xpzouying.github.io/tags/life" title="life">life</a>
+  
+  <a class="ui label" href="https://xpzouying.github.io/tags/reading" title="reading">reading</a>
+  
+</section>
+
+
+
+<section class="ui attached inverted segment dream-categories">
+  <div class="ui inverted accordion">
+    
+    <div class="title">
+      <i class="dropdown icon"></i>
+      <a href="https://xpzouying.github.io/categories/code" class="item" style="color: white;">code</a>
+    </div>
+    <div class="content">
+      <div class="ui link inverted list">
+      
+      <div class="item" style="padding-left: 24px;">
+        <i class="cocktail icon"></i>
+        <div class="content">
+          <a href="https://xpzouying.github.io/post/dive_into_beego_router/" class="item">Dive Into beego/router</a>
+        </div>
+      </div>
+      
+      <div class="item" style="padding-left: 24px;">
+        <i class="cocktail icon"></i>
+        <div class="content">
+          <a href="https://xpzouying.github.io/post/dive_into_http_router_02/" class="item">Dive_into_http_router_02</a>
+        </div>
+      </div>
+      
+      <div class="item" style="padding-left: 24px;">
+        <i class="cocktail icon"></i>
+        <div class="content">
+          <a href="https://xpzouying.github.io/post/dive_into_http_router_01/" class="item">Dive Into HTTP Router in Golang</a>
+        </div>
+      </div>
+      
+      <div class="item" style="padding-left: 24px;">
+        <i class="cocktail icon"></i>
+        <div class="content">
+          <a href="https://xpzouying.github.io/post/dive_into_src_plan/" class="item">Dive Into Code</a>
+        </div>
+      </div>
+      
+      </div>
+    </div>
+    
+    <div class="title">
+      <i class="dropdown icon"></i>
+      <a href="https://xpzouying.github.io/categories/life" class="item" style="color: white;">life</a>
+    </div>
+    <div class="content">
+      <div class="ui link inverted list">
+      
+      <div class="item" style="padding-left: 24px;">
+        <i class="cocktail icon"></i>
+        <div class="content">
+          <a href="https://xpzouying.github.io/post/reading_notebook_201811/" class="item">2018年11月阅读记录</a>
+        </div>
+      </div>
+      
+      <div class="item" style="padding-left: 24px;">
+        <i class="cocktail icon"></i>
+        <div class="content">
+          <a href="https://xpzouying.github.io/post/reading_notebook_201810/" class="item">2018年10月阅读记录</a>
+        </div>
+      </div>
+      
+      <div class="item" style="padding-left: 24px;">
+        <i class="cocktail icon"></i>
+        <div class="content">
+          <a href="https://xpzouying.github.io/post/reading_notebook_201808/" class="item">2018年8月阅读记录</a>
+        </div>
+      </div>
+      
+      <div class="item" style="padding-left: 24px;">
+        <i class="cocktail icon"></i>
+        <div class="content">
+          <a href="https://xpzouying.github.io/post/reading_notebook_201809/" class="item">2018年9月阅读记录</a>
+        </div>
+      </div>
+      
+      </div>
+    </div>
+    
+  </div>
+</section>
+
+
+<section class="ui bottom attached center aligned inverted segment">
+    
+    <p>© 2018 zouying.is</p>
+    
+    <p>Powered by <a href="https://gohugo.io/" target="_blank">Hugo</a> with theme <a href="https://github.com/g1eny0ung/hugo-theme-dream" target="_blank">Dream</a>.</p>
+</section>
+
+
+  </div>
+</div>
+
+      </section>
+      <section class="back">
+        <nav class="ui top secondary menu" style="overflow-x: auto">
+  <div class="item">
+    <i class="inverted big link bullseye icon dream-flip-toggle" title="翻转！"></i>
+  </div>
+  
+  <div class="item">
+    <a href="mailto:xpzouying@gmail.com">
+      <i class="inverted big mail icon" title="email"></i>
+    </a>
+  </div>
+  
+  
+  <div class="item">
+    <a href="https://github.com/xpzouying" target="_blank">
+      <i class="inverted big github icon" title="github"></i>
+    </a>
+  </div>
+  
+  
+  
+  <div class="item">
+    <a href="https://www.stackoverflow.com/users/701268/zouying" target="_blank">
+      <i class="inverted big stack overflow icon" title="stackoverflow"></i>
+    </a>
+  </div>
+  
+  
+</nav>
+
+<div class="ui centered grid about">
+  <div class="fifteen wide mobile fifteen wide tablet fifteen wide computer column">
+
+    <section class="ui stacked segments">
+      <header class="ui inverted segment">
+        <h2 class="ui header">
+          About
+        </h2>
+      </header>
+
+      <article class="ui inverted segment back-about">
+        <div class="ui stackable three column grid">
+          <div class="column">
+              
+              <h3 id="我的生活">我的生活</h3>
+
+<p>zouying</p>
+
+<p>coder@baidu</p>
+
+<h3 id="生活">生活</h3>
+
+<p>两只猫，一只英短：钱多多，一只加菲猫：泡芙</p>
+
+              
+          </div>
+          <div class="column">
+              
+          </div>
+          <div class="column">
+              
+          </div>
+        </div>
+      </article>
+
+      
+      <footer class="ui secondary segment">
+        © This post is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License，please give source if you likes to quote or reproduce.
+      </footer>
+      
+
+      
+      
+    </section>
+
+  </div>
+</div>
+
+      </section>
+    </div>
+  </div>
+
+  
+<script src="https://xpzouying.github.io/js/jquery.min.js"></script>
+<script src="https://xpzouying.github.io/js/semantic.min.js"></script>
+<script src="https://xpzouying.github.io/js/html2canvas.min.js"></script>
+<script src="https://xpzouying.github.io/js/bg.js"></script>
+<script src="https://xpzouying.github.io/js/site.js"></script>
+
+
+
+</body>
+
+</html>
