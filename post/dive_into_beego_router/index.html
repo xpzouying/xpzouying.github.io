@@ -11,7 +11,7 @@
     
     <meta property="og:site_name" content="zouying.is">
     <meta property="og:title" content="
-  Dive Into beego/router - zouying.is
+  Dive Into beego/router 系列一 - zouying.is
 ">
     <meta property="og:description" content="">
     <meta property="og:type" content="website">
@@ -23,7 +23,7 @@
 
     <base href="https://xpzouying.github.io">
     <title>
-  Dive Into beego/router - zouying.is
+  Dive Into beego/router 系列一 - zouying.is
 </title>
 
     <link rel="canonical" href="https://xpzouying.github.io/post/dive_into_beego_router/">
@@ -76,7 +76,7 @@
   <section class="container page">
   <article>
     <header>
-      <h1>Dive Into beego/router</h1>
+      <h1>Dive Into beego/router 系列一</h1>
     </header>
 
     <p>上一次分析了默认的http server以及router的工作方式。
@@ -634,6 +634,250 @@ router肯定会满足http中的ServeHTTP interface，这样才能满足对应的
 	<span class="p">}</span>
 <span class="p">}</span></code></pre></div>
 <p>上面这段代码是如何注册router的详细过程。</p>
+
+<ol>
+<li><p>从input分析</p>
+
+<ol>
+<li>segments: 为路径按照<code>/</code> split分割后的字符串数组</li>
+<li>route: 为route，里面包含了http handle func</li>
+<li>wildcards: 通配符，nil。如果我们的节点是通配符的话，那么我们会保留我们所有的通配符定义，比如[&ldquo;id&rdquo; &ldquo;name&rdquo;] for the wildcard &ldquo;:id&rdquo; and &ldquo;:name&rdquo;。</li>
+<li>reg: 为空字符串，表示我们不是一个正则表达式</li>
+</ol></li>
+
+<li><p>函数里面按照segments的不同，进行了不同的处理。在第一个注册函数中，我们只是对路径<code>/</code>进行了注册，所以在这里的segments的长度也就是0，并且我们的没有使用正则表达式。</p></li>
+</ol>
+
+<p>我们在该函数里面仅仅是调用了一行语句：</p>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go">   			<span class="nx">t</span><span class="p">.</span><span class="nx">leaves</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">t</span><span class="p">.</span><span class="nx">leaves</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">leafInfo</span><span class="p">{</span><span class="nx">runObject</span><span class="p">:</span> <span class="nx">route</span><span class="p">,</span> <span class="nx">wildcards</span><span class="p">:</span> <span class="nx">wildcards</span><span class="p">})</span></code></pre></div>
+<p>我们在Tree的叶子结点上增加了一个叶子结点的信息：<code>route</code>，也就是把我们的http handle func的所有信息都传递进去，wildcards为nil，没有通配符。</p>
+
+<p>当该http处理函数注册完成后，启动http server时，我们下面分析查找的过程。</p>
+
+<h3 id="beego-router-搜索过程">beego router 搜索过程</h3>
+
+<p>调用<code>BeeApp.Run()</code>，其实在底层就是调用了http Serve(l)，这其中的过程参考http router的解析，在这里就不再重复。</p>
+
+<p>最后会调用到http/server.go中的下列方法，</p>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="p">(</span><span class="nx">sh</span> <span class="nx">serverHandler</span><span class="p">)</span> <span class="nx">ServeHTTP</span><span class="p">(</span><span class="nx">rw</span> <span class="nx">ResponseWriter</span><span class="p">,</span> <span class="nx">req</span> <span class="o">*</span><span class="nx">Request</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">handler</span> <span class="o">:=</span> <span class="nx">sh</span><span class="p">.</span><span class="nx">srv</span><span class="p">.</span><span class="nx">Handler</span>
+    <span class="k">if</span> <span class="nx">handler</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+        <span class="nx">handler</span> <span class="p">=</span> <span class="nx">DefaultServeMux</span>
+    <span class="p">}</span>
+    <span class="k">if</span> <span class="nx">req</span><span class="p">.</span><span class="nx">RequestURI</span> <span class="o">==</span> <span class="s">&#34;*&#34;</span> <span class="o">&amp;&amp;</span> <span class="nx">req</span><span class="p">.</span><span class="nx">Method</span> <span class="o">==</span> <span class="s">&#34;OPTIONS&#34;</span> <span class="p">{</span>
+        <span class="nx">handler</span> <span class="p">=</span> <span class="nx">globalOptionsHandler</span><span class="p">{}</span>
+    <span class="p">}</span>
+    <span class="nx">handler</span><span class="p">.</span><span class="nx">ServeHTTP</span><span class="p">(</span><span class="nx">rw</span><span class="p">,</span> <span class="nx">req</span><span class="p">)</span>
+<span class="p">}</span></code></pre></div>
+<p>在http router中解析过该函数，当时由于sh.srv.Handler为nil，所以使用的是默认的DefaultServeMux。</p>
+
+<p>但是在当前beego中，Handler不再为nil，在之前分析过，当前的Handler为<code>ControllerRegister</code>类型，所以其实当运行的过程中，接收到一个请求后，会进入到<code>ControllerRegister.ServeHTTP</code>方法。</p>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// Implement http.Handler interface.
+</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">p</span> <span class="o">*</span><span class="nx">ControllerRegister</span><span class="p">)</span> <span class="nx">ServeHTTP</span><span class="p">(</span><span class="nx">rw</span> <span class="nx">http</span><span class="p">.</span><span class="nx">ResponseWriter</span><span class="p">,</span> <span class="nx">r</span> <span class="o">*</span><span class="nx">http</span><span class="p">.</span><span class="nx">Request</span><span class="p">)</span> <span class="p">{</span>
+	<span class="nx">startTime</span> <span class="o">:=</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Now</span><span class="p">()</span>
+	<span class="kd">var</span> <span class="p">(</span>
+		<span class="nx">runRouter</span>    <span class="nx">reflect</span><span class="p">.</span><span class="nx">Type</span>
+		<span class="nx">findRouter</span>   <span class="kt">bool</span>
+		<span class="nx">runMethod</span>    <span class="kt">string</span>
+		<span class="nx">methodParams</span> <span class="p">[]</span><span class="o">*</span><span class="nx">param</span><span class="p">.</span><span class="nx">MethodParam</span>
+		<span class="nx">routerInfo</span>   <span class="o">*</span><span class="nx">ControllerInfo</span>
+		<span class="nx">isRunnable</span>   <span class="kt">bool</span>
+	<span class="p">)</span>
+	<span class="nx">context</span> <span class="o">:=</span> <span class="nx">p</span><span class="p">.</span><span class="nx">pool</span><span class="p">.</span><span class="nx">Get</span><span class="p">().(</span><span class="o">*</span><span class="nx">beecontext</span><span class="p">.</span><span class="nx">Context</span><span class="p">)</span>
+	<span class="nx">context</span><span class="p">.</span><span class="nx">Reset</span><span class="p">(</span><span class="nx">rw</span><span class="p">,</span> <span class="nx">r</span><span class="p">)</span>
+
+	<span class="k">defer</span> <span class="nx">p</span><span class="p">.</span><span class="nx">pool</span><span class="p">.</span><span class="nx">Put</span><span class="p">(</span><span class="nx">context</span><span class="p">)</span>
+	<span class="k">if</span> <span class="nx">BConfig</span><span class="p">.</span><span class="nx">RecoverFunc</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+		<span class="k">defer</span> <span class="nx">BConfig</span><span class="p">.</span><span class="nx">RecoverFunc</span><span class="p">(</span><span class="nx">context</span><span class="p">)</span>
+	<span class="p">}</span>
+
+	<span class="nx">context</span><span class="p">.</span><span class="nx">Output</span><span class="p">.</span><span class="nx">EnableGzip</span> <span class="p">=</span> <span class="nx">BConfig</span><span class="p">.</span><span class="nx">EnableGzip</span>
+
+	<span class="k">if</span> <span class="nx">BConfig</span><span class="p">.</span><span class="nx">RunMode</span> <span class="o">==</span> <span class="nx">DEV</span> <span class="p">{</span>
+		<span class="nx">context</span><span class="p">.</span><span class="nx">Output</span><span class="p">.</span><span class="nx">Header</span><span class="p">(</span><span class="s">&#34;Server&#34;</span><span class="p">,</span> <span class="nx">BConfig</span><span class="p">.</span><span class="nx">ServerName</span><span class="p">)</span>
+	<span class="p">}</span>
+
+	<span class="kd">var</span> <span class="nx">urlPath</span> <span class="p">=</span> <span class="nx">r</span><span class="p">.</span><span class="nx">URL</span><span class="p">.</span><span class="nx">Path</span>
+
+	<span class="k">if</span> <span class="p">!</span><span class="nx">BConfig</span><span class="p">.</span><span class="nx">RouterCaseSensitive</span> <span class="p">{</span>
+		<span class="nx">urlPath</span> <span class="p">=</span> <span class="nx">strings</span><span class="p">.</span><span class="nx">ToLower</span><span class="p">(</span><span class="nx">urlPath</span><span class="p">)</span>
+	<span class="p">}</span>
+
+	<span class="c1">// filter wrong http method
+</span><span class="c1"></span>	<span class="k">if</span> <span class="p">!</span><span class="nx">HTTPMETHOD</span><span class="p">[</span><span class="nx">r</span><span class="p">.</span><span class="nx">Method</span><span class="p">]</span> <span class="p">{</span>
+		<span class="nx">http</span><span class="p">.</span><span class="nx">Error</span><span class="p">(</span><span class="nx">rw</span><span class="p">,</span> <span class="s">&#34;Method Not Allowed&#34;</span><span class="p">,</span> <span class="mi">405</span><span class="p">)</span>
+		<span class="k">goto</span> <span class="nx">Admin</span>
+	<span class="p">}</span>
+
+	<span class="c1">// filter for static file
+</span><span class="c1"></span>	<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nx">p</span><span class="p">.</span><span class="nx">filters</span><span class="p">[</span><span class="nx">BeforeStatic</span><span class="p">])</span> <span class="p">&gt;</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="nx">p</span><span class="p">.</span><span class="nx">execFilter</span><span class="p">(</span><span class="nx">context</span><span class="p">,</span> <span class="nx">urlPath</span><span class="p">,</span> <span class="nx">BeforeStatic</span><span class="p">)</span> <span class="p">{</span>
+		<span class="k">goto</span> <span class="nx">Admin</span>
+	<span class="p">}</span>
+
+	<span class="nx">serverStaticRouter</span><span class="p">(</span><span class="nx">context</span><span class="p">)</span>
+
+	<span class="k">if</span> <span class="nx">context</span><span class="p">.</span><span class="nx">ResponseWriter</span><span class="p">.</span><span class="nx">Started</span> <span class="p">{</span>
+		<span class="nx">findRouter</span> <span class="p">=</span> <span class="kc">true</span>
+		<span class="k">goto</span> <span class="nx">Admin</span>
+	<span class="p">}</span>
+
+	<span class="k">if</span> <span class="nx">r</span><span class="p">.</span><span class="nx">Method</span> <span class="o">!=</span> <span class="nx">http</span><span class="p">.</span><span class="nx">MethodGet</span> <span class="o">&amp;&amp;</span> <span class="nx">r</span><span class="p">.</span><span class="nx">Method</span> <span class="o">!=</span> <span class="nx">http</span><span class="p">.</span><span class="nx">MethodHead</span> <span class="p">{</span>
+		<span class="c1">// ...
+</span><span class="c1"></span>	<span class="p">}</span>
+
+	<span class="c1">// session init
+</span><span class="c1"></span>	<span class="k">if</span> <span class="nx">BConfig</span><span class="p">.</span><span class="nx">WebConfig</span><span class="p">.</span><span class="nx">Session</span><span class="p">.</span><span class="nx">SessionOn</span> <span class="p">{</span>
+		<span class="c1">// ...
+</span><span class="c1"></span>	<span class="p">}</span>
+	<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nx">p</span><span class="p">.</span><span class="nx">filters</span><span class="p">[</span><span class="nx">BeforeRouter</span><span class="p">])</span> <span class="p">&gt;</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="nx">p</span><span class="p">.</span><span class="nx">execFilter</span><span class="p">(</span><span class="nx">context</span><span class="p">,</span> <span class="nx">urlPath</span><span class="p">,</span> <span class="nx">BeforeRouter</span><span class="p">)</span> <span class="p">{</span>
+		<span class="k">goto</span> <span class="nx">Admin</span>
+	<span class="p">}</span>
+	<span class="c1">// User can define RunController and RunMethod in filter
+</span><span class="c1"></span>	<span class="k">if</span> <span class="nx">context</span><span class="p">.</span><span class="nx">Input</span><span class="p">.</span><span class="nx">RunController</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="o">&amp;&amp;</span> <span class="nx">context</span><span class="p">.</span><span class="nx">Input</span><span class="p">.</span><span class="nx">RunMethod</span> <span class="o">!=</span> <span class="s">&#34;&#34;</span> <span class="p">{</span>
+		<span class="nx">findRouter</span> <span class="p">=</span> <span class="kc">true</span>
+		<span class="nx">runMethod</span> <span class="p">=</span> <span class="nx">context</span><span class="p">.</span><span class="nx">Input</span><span class="p">.</span><span class="nx">RunMethod</span>
+		<span class="nx">runRouter</span> <span class="p">=</span> <span class="nx">context</span><span class="p">.</span><span class="nx">Input</span><span class="p">.</span><span class="nx">RunController</span>
+	<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+		<span class="nx">routerInfo</span><span class="p">,</span> <span class="nx">findRouter</span> <span class="p">=</span> <span class="nx">p</span><span class="p">.</span><span class="nx">FindRouter</span><span class="p">(</span><span class="nx">context</span><span class="p">)</span>
+	<span class="p">}</span>
+
+	<span class="c1">//if no matches to url, throw a not found exception
+</span><span class="c1"></span>	<span class="k">if</span> <span class="p">!</span><span class="nx">findRouter</span> <span class="p">{</span>
+		<span class="nx">exception</span><span class="p">(</span><span class="s">&#34;404&#34;</span><span class="p">,</span> <span class="nx">context</span><span class="p">)</span>
+		<span class="k">goto</span> <span class="nx">Admin</span>
+	<span class="p">}</span>
+	<span class="k">if</span> <span class="nx">splat</span> <span class="o">:=</span> <span class="nx">context</span><span class="p">.</span><span class="nx">Input</span><span class="p">.</span><span class="nx">Param</span><span class="p">(</span><span class="s">&#34;:splat&#34;</span><span class="p">);</span> <span class="nx">splat</span> <span class="o">!=</span> <span class="s">&#34;&#34;</span> <span class="p">{</span>
+		<span class="k">for</span> <span class="nx">k</span><span class="p">,</span> <span class="nx">v</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">strings</span><span class="p">.</span><span class="nx">Split</span><span class="p">(</span><span class="nx">splat</span><span class="p">,</span> <span class="s">&#34;/&#34;</span><span class="p">)</span> <span class="p">{</span>
+			<span class="nx">context</span><span class="p">.</span><span class="nx">Input</span><span class="p">.</span><span class="nx">SetParam</span><span class="p">(</span><span class="nx">strconv</span><span class="p">.</span><span class="nx">Itoa</span><span class="p">(</span><span class="nx">k</span><span class="p">),</span> <span class="nx">v</span><span class="p">)</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+
+	<span class="c1">//execute middleware filters
+</span><span class="c1"></span>	<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nx">p</span><span class="p">.</span><span class="nx">filters</span><span class="p">[</span><span class="nx">BeforeExec</span><span class="p">])</span> <span class="p">&gt;</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="nx">p</span><span class="p">.</span><span class="nx">execFilter</span><span class="p">(</span><span class="nx">context</span><span class="p">,</span> <span class="nx">urlPath</span><span class="p">,</span> <span class="nx">BeforeExec</span><span class="p">)</span> <span class="p">{</span>
+		<span class="k">goto</span> <span class="nx">Admin</span>
+	<span class="p">}</span>
+
+	<span class="c1">//check policies
+</span><span class="c1"></span>	<span class="k">if</span> <span class="nx">p</span><span class="p">.</span><span class="nx">execPolicy</span><span class="p">(</span><span class="nx">context</span><span class="p">,</span> <span class="nx">urlPath</span><span class="p">)</span> <span class="p">{</span>
+		<span class="k">goto</span> <span class="nx">Admin</span>
+	<span class="p">}</span>
+
+	<span class="k">if</span> <span class="nx">routerInfo</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+		<span class="c1">//store router pattern into context
+</span><span class="c1"></span>		<span class="nx">context</span><span class="p">.</span><span class="nx">Input</span><span class="p">.</span><span class="nx">SetData</span><span class="p">(</span><span class="s">&#34;RouterPattern&#34;</span><span class="p">,</span> <span class="nx">routerInfo</span><span class="p">.</span><span class="nx">pattern</span><span class="p">)</span>
+		<span class="k">if</span> <span class="nx">routerInfo</span><span class="p">.</span><span class="nx">routerType</span> <span class="o">==</span> <span class="nx">routerTypeRESTFul</span> <span class="p">{</span>
+			<span class="k">if</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">ok</span> <span class="o">:=</span> <span class="nx">routerInfo</span><span class="p">.</span><span class="nx">methods</span><span class="p">[</span><span class="nx">r</span><span class="p">.</span><span class="nx">Method</span><span class="p">];</span> <span class="nx">ok</span> <span class="p">{</span>
+				<span class="nx">isRunnable</span> <span class="p">=</span> <span class="kc">true</span>
+				<span class="nx">routerInfo</span><span class="p">.</span><span class="nx">runFunction</span><span class="p">(</span><span class="nx">context</span><span class="p">)</span>
+			<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+				<span class="nx">exception</span><span class="p">(</span><span class="s">&#34;405&#34;</span><span class="p">,</span> <span class="nx">context</span><span class="p">)</span>
+				<span class="k">goto</span> <span class="nx">Admin</span>
+			<span class="p">}</span>
+		<span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="nx">routerInfo</span><span class="p">.</span><span class="nx">routerType</span> <span class="o">==</span> <span class="nx">routerTypeHandler</span> <span class="p">{</span>
+			<span class="nx">isRunnable</span> <span class="p">=</span> <span class="kc">true</span>
+			<span class="nx">routerInfo</span><span class="p">.</span><span class="nx">handler</span><span class="p">.</span><span class="nx">ServeHTTP</span><span class="p">(</span><span class="nx">rw</span><span class="p">,</span> <span class="nx">r</span><span class="p">)</span>
+		<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+			<span class="nx">runRouter</span> <span class="p">=</span> <span class="nx">routerInfo</span><span class="p">.</span><span class="nx">controllerType</span>
+			<span class="nx">methodParams</span> <span class="p">=</span> <span class="nx">routerInfo</span><span class="p">.</span><span class="nx">methodParams</span>
+			<span class="nx">method</span> <span class="o">:=</span> <span class="nx">r</span><span class="p">.</span><span class="nx">Method</span>
+			<span class="k">if</span> <span class="nx">r</span><span class="p">.</span><span class="nx">Method</span> <span class="o">==</span> <span class="nx">http</span><span class="p">.</span><span class="nx">MethodPost</span> <span class="o">&amp;&amp;</span> <span class="nx">context</span><span class="p">.</span><span class="nx">Input</span><span class="p">.</span><span class="nx">Query</span><span class="p">(</span><span class="s">&#34;_method&#34;</span><span class="p">)</span> <span class="o">==</span> <span class="nx">http</span><span class="p">.</span><span class="nx">MethodPost</span> <span class="p">{</span>
+				<span class="nx">method</span> <span class="p">=</span> <span class="nx">http</span><span class="p">.</span><span class="nx">MethodPut</span>
+			<span class="p">}</span>
+			<span class="k">if</span> <span class="nx">r</span><span class="p">.</span><span class="nx">Method</span> <span class="o">==</span> <span class="nx">http</span><span class="p">.</span><span class="nx">MethodPost</span> <span class="o">&amp;&amp;</span> <span class="nx">context</span><span class="p">.</span><span class="nx">Input</span><span class="p">.</span><span class="nx">Query</span><span class="p">(</span><span class="s">&#34;_method&#34;</span><span class="p">)</span> <span class="o">==</span> <span class="nx">http</span><span class="p">.</span><span class="nx">MethodDelete</span> <span class="p">{</span>
+				<span class="nx">method</span> <span class="p">=</span> <span class="nx">http</span><span class="p">.</span><span class="nx">MethodDelete</span>
+			<span class="p">}</span>
+			<span class="k">if</span> <span class="nx">m</span><span class="p">,</span> <span class="nx">ok</span> <span class="o">:=</span> <span class="nx">routerInfo</span><span class="p">.</span><span class="nx">methods</span><span class="p">[</span><span class="nx">method</span><span class="p">];</span> <span class="nx">ok</span> <span class="p">{</span>
+				<span class="nx">runMethod</span> <span class="p">=</span> <span class="nx">m</span>
+			<span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="nx">m</span><span class="p">,</span> <span class="nx">ok</span> <span class="p">=</span> <span class="nx">routerInfo</span><span class="p">.</span><span class="nx">methods</span><span class="p">[</span><span class="s">&#34;*&#34;</span><span class="p">];</span> <span class="nx">ok</span> <span class="p">{</span>
+				<span class="nx">runMethod</span> <span class="p">=</span> <span class="nx">m</span>
+			<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+				<span class="nx">runMethod</span> <span class="p">=</span> <span class="nx">method</span>
+			<span class="p">}</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+
+	<span class="c1">// also defined runRouter &amp; runMethod from filter
+</span><span class="c1"></span>	<span class="k">if</span> <span class="p">!</span><span class="nx">isRunnable</span> <span class="p">{</span>
+		<span class="c1">// ...
+</span><span class="c1"></span>	<span class="p">}</span>
+
+	<span class="c1">//execute middleware filters
+</span><span class="c1"></span>	<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nx">p</span><span class="p">.</span><span class="nx">filters</span><span class="p">[</span><span class="nx">AfterExec</span><span class="p">])</span> <span class="p">&gt;</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="nx">p</span><span class="p">.</span><span class="nx">execFilter</span><span class="p">(</span><span class="nx">context</span><span class="p">,</span> <span class="nx">urlPath</span><span class="p">,</span> <span class="nx">AfterExec</span><span class="p">)</span> <span class="p">{</span>
+		<span class="k">goto</span> <span class="nx">Admin</span>
+	<span class="p">}</span>
+
+	<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nx">p</span><span class="p">.</span><span class="nx">filters</span><span class="p">[</span><span class="nx">FinishRouter</span><span class="p">])</span> <span class="p">&gt;</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="nx">p</span><span class="p">.</span><span class="nx">execFilter</span><span class="p">(</span><span class="nx">context</span><span class="p">,</span> <span class="nx">urlPath</span><span class="p">,</span> <span class="nx">FinishRouter</span><span class="p">)</span> <span class="p">{</span>
+		<span class="k">goto</span> <span class="nx">Admin</span>
+	<span class="p">}</span>
+
+<span class="nx">Admin</span><span class="p">:</span>
+	<span class="c1">//admin module record QPS
+</span><span class="c1"></span>
+	<span class="nx">statusCode</span> <span class="o">:=</span> <span class="nx">context</span><span class="p">.</span><span class="nx">ResponseWriter</span><span class="p">.</span><span class="nx">Status</span>
+	<span class="k">if</span> <span class="nx">statusCode</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">{</span>
+		<span class="nx">statusCode</span> <span class="p">=</span> <span class="mi">200</span>
+	<span class="p">}</span>
+
+	<span class="nx">logAccess</span><span class="p">(</span><span class="nx">context</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">startTime</span><span class="p">,</span> <span class="nx">statusCode</span><span class="p">)</span>
+
+	<span class="nx">timeDur</span> <span class="o">:=</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Since</span><span class="p">(</span><span class="nx">startTime</span><span class="p">)</span>
+	<span class="nx">context</span><span class="p">.</span><span class="nx">ResponseWriter</span><span class="p">.</span><span class="nx">Elapsed</span> <span class="p">=</span> <span class="nx">timeDur</span>
+	<span class="k">if</span> <span class="nx">BConfig</span><span class="p">.</span><span class="nx">Listen</span><span class="p">.</span><span class="nx">EnableAdmin</span> <span class="p">{</span>
+		<span class="c1">// ... 如果启动admin，跳过
+</span><span class="c1"></span>	<span class="p">}</span>
+
+	<span class="k">if</span> <span class="nx">BConfig</span><span class="p">.</span><span class="nx">RunMode</span> <span class="o">==</span> <span class="nx">DEV</span> <span class="o">&amp;&amp;</span> <span class="p">!</span><span class="nx">BConfig</span><span class="p">.</span><span class="nx">Log</span><span class="p">.</span><span class="nx">AccessLogs</span> <span class="p">{</span>
+		<span class="c1">// ... 如果是开发模式，跳过
+</span><span class="c1"></span>	<span class="p">}</span>
+	<span class="c1">// Call WriteHeader if status code has been set changed
+</span><span class="c1"></span>	<span class="k">if</span> <span class="nx">context</span><span class="p">.</span><span class="nx">Output</span><span class="p">.</span><span class="nx">Status</span> <span class="o">!=</span> <span class="mi">0</span> <span class="p">{</span>
+		<span class="nx">context</span><span class="p">.</span><span class="nx">ResponseWriter</span><span class="p">.</span><span class="nx">WriteHeader</span><span class="p">(</span><span class="nx">context</span><span class="p">.</span><span class="nx">Output</span><span class="p">.</span><span class="nx">Status</span><span class="p">)</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// Reset init Context, BeegoInput and BeegoOutput
+</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">ctx</span> <span class="o">*</span><span class="nx">Context</span><span class="p">)</span> <span class="nx">Reset</span><span class="p">(</span><span class="nx">rw</span> <span class="nx">http</span><span class="p">.</span><span class="nx">ResponseWriter</span><span class="p">,</span> <span class="nx">r</span> <span class="o">*</span><span class="nx">http</span><span class="p">.</span><span class="nx">Request</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">ctx</span><span class="p">.</span><span class="nx">Request</span> <span class="p">=</span> <span class="nx">r</span>
+    <span class="k">if</span> <span class="nx">ctx</span><span class="p">.</span><span class="nx">ResponseWriter</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+        <span class="nx">ctx</span><span class="p">.</span><span class="nx">ResponseWriter</span> <span class="p">=</span> <span class="o">&amp;</span><span class="nx">Response</span><span class="p">{}</span>
+    <span class="p">}</span>
+    <span class="nx">ctx</span><span class="p">.</span><span class="nx">ResponseWriter</span><span class="p">.</span><span class="nx">reset</span><span class="p">(</span><span class="nx">rw</span><span class="p">)</span>
+    <span class="nx">ctx</span><span class="p">.</span><span class="nx">Input</span><span class="p">.</span><span class="nx">Reset</span><span class="p">(</span><span class="nx">ctx</span><span class="p">)</span>
+    <span class="nx">ctx</span><span class="p">.</span><span class="nx">Output</span><span class="p">.</span><span class="nx">Reset</span><span class="p">(</span><span class="nx">ctx</span><span class="p">)</span>
+    <span class="nx">ctx</span><span class="p">.</span><span class="nx">_xsrfToken</span> <span class="p">=</span> <span class="s">&#34;&#34;</span>
+<span class="p">}</span></code></pre></div>
+<ol>
+<li><code>context(beecontext.Context)</code>使用了sync.Pool做cache优化。每次在调用<code>Reset</code>时，把请求的<code>http.ResponseWriter</code>和<code>http.Request</code>传给context。</li>
+<li>定义了<code>RecoverFunc</code>用来恢复用。这个还比较感兴趣，记下TODO以后分析。</li>
+<li>method的请求方法如果beego不支持，则会写405，Method Not Allowed错误，不过大部分http method都支持。</li>
+<li>搜索对应的router，调用的是<code>routerInfo, findRouter = p.FindRouter(context)</code>，后面详细分析。</li>
+<li>我们当前的请求为：<code>curl -X GET http://localhost:8080</code>，我们是可以找到对应的router。所以我们进入<code>if routerInfo != nil</code>分支中分析。我们在注册的时候，使用的是<code>route.routerType = routerTypeRESTFul</code>，所以我们我们会得到两个部分：
+
+<ol>
+<li><code>isRunnable = true</code></li>
+<li><code>routerInfo.runFunction(context)</code>：这里就是调用到了我们定义的HandleFunc了，我们只是简单的进行了简单的输出<code>ctx.Output.Body([]byte(&quot;hello world&quot;))</code>。</li>
+</ol></li>
+<li>由于我们当前的isRunnable是true，所以if分支里面的一大坨代码暂时跳过。后面的代码也暂时跳过。分析之前省略的如何搜索到对应的router。</li>
+</ol>
+
+<h4 id="如何搜索找到对应的router">如何搜索找到对应的router</h4>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// FindRouter Find Router info for URL
+</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">p</span> <span class="o">*</span><span class="nx">ControllerRegister</span><span class="p">)</span> <span class="nx">FindRouter</span><span class="p">(</span><span class="nx">context</span> <span class="o">*</span><span class="nx">beecontext</span><span class="p">.</span><span class="nx">Context</span><span class="p">)</span> <span class="p">(</span><span class="nx">routerInfo</span> <span class="o">*</span><span class="nx">Controller</span>
+<span class="nx">Info</span><span class="p">,</span> <span class="nx">isFind</span> <span class="kt">bool</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">urlPath</span> <span class="p">=</span> <span class="nx">context</span><span class="p">.</span><span class="nx">Input</span><span class="p">.</span><span class="nx">URL</span><span class="p">()</span>
+    <span class="k">if</span> <span class="p">!</span><span class="nx">BConfig</span><span class="p">.</span><span class="nx">RouterCaseSensitive</span> <span class="p">{</span>
+        <span class="nx">urlPath</span> <span class="p">=</span> <span class="nx">strings</span><span class="p">.</span><span class="nx">ToLower</span><span class="p">(</span><span class="nx">urlPath</span><span class="p">)</span>
+    <span class="p">}</span>
+    <span class="nx">httpMethod</span> <span class="o">:=</span> <span class="nx">context</span><span class="p">.</span><span class="nx">Input</span><span class="p">.</span><span class="nx">Method</span><span class="p">()</span>
+    <span class="k">if</span> <span class="nx">t</span><span class="p">,</span> <span class="nx">ok</span> <span class="o">:=</span> <span class="nx">p</span><span class="p">.</span><span class="nx">routers</span><span class="p">[</span><span class="nx">httpMethod</span><span class="p">];</span> <span class="nx">ok</span> <span class="p">{</span>
+        <span class="nx">runObject</span> <span class="o">:=</span> <span class="nx">t</span><span class="p">.</span><span class="nx">Match</span><span class="p">(</span><span class="nx">urlPath</span><span class="p">,</span> <span class="nx">context</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nx">r</span><span class="p">,</span> <span class="nx">ok</span> <span class="o">:=</span> <span class="nx">runObject</span><span class="p">.(</span><span class="o">*</span><span class="nx">ControllerInfo</span><span class="p">);</span> <span class="nx">ok</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="nx">r</span><span class="p">,</span> <span class="kc">true</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="k">return</span>
+<span class="p">}</span></code></pre></div>
+<p>由于我们把http request的信息都放到了beego.context中的Input了，所以我们从context中找到请求的所有信息。这里我们需要根据request的url和method进行router的搜索匹配。</p>
   </article>
 </section>
 
