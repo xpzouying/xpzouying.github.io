@@ -6,10 +6,21 @@
     <description>Recent content in Posts on zouying.is</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cmn-Hans</language>
-    <lastBuildDate>Mon, 26 Nov 2018 21:52:25 +0800</lastBuildDate>
+    <lastBuildDate>Sat, 08 Dec 2018 21:38:55 +0800</lastBuildDate>
     
 	<atom:link href="https://xpzouying.github.io/post/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Reading_notebook_201812</title>
+      <link>https://xpzouying.github.io/post/reading_notebook_201812/</link>
+      <pubDate>Sat, 08 Dec 2018 21:38:55 +0800</pubDate>
+      
+      <guid>https://xpzouying.github.io/post/reading_notebook_201812/</guid>
+      <description>&lt;p&gt;Habit One: reading&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;</description>
+    </item>
     
     <item>
       <title>Dive Into beego/router 系列一</title>
