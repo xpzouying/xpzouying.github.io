@@ -6,10 +6,33 @@
     <description>Recent content in Posts on zouying.is</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cmn-Hans</language>
-    <lastBuildDate>Sat, 08 Dec 2018 21:38:55 +0800</lastBuildDate>
+    <lastBuildDate>Sun, 16 Dec 2018 17:57:03 +0800</lastBuildDate>
     
 	<atom:link href="https://xpzouying.github.io/post/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>两周JS学习历程</title>
+      <link>https://xpzouying.github.io/post/two_week_learning_js/</link>
+      <pubDate>Sun, 16 Dec 2018 17:57:03 +0800</pubDate>
+      
+      <guid>https://xpzouying.github.io/post/two_week_learning_js/</guid>
+      <description>&lt;p&gt;通过这篇文章，我将记录自己在2018年剩下两周左右的时间内，系统的、强化的学习两周的Javascript，弥补技术栈中最薄弱的前端知识。&lt;/p&gt;
+
+&lt;h3 id=&#34;小目标&#34;&gt;小目标：&lt;/h3&gt;
+
+&lt;p&gt;希望能够通过两周的学习，能够做出一个较好的展示页面出来。&lt;/p&gt;
+
+&lt;h3 id=&#34;工程展示&#34;&gt;工程展示&lt;/h3&gt;
+
+&lt;p&gt;代码库：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://github.com/xpzouying/learning_fontend&#34;&gt;https://github.com/xpzouying/learning_fontend&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;/p&gt;</description>
+    </item>
     
     <item>
       <title>Reading_notebook_201812</title>
