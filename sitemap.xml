@@ -3,6 +3,11 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>https://xpzouying.github.io/post/how_to_contributing/</loc>
+    <lastmod>2018-12-21T20:31:19+08:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://xpzouying.github.io/post/two_week_learning_js/</loc>
     <lastmod>2018-12-16T17:57:03+08:00</lastmod>
   </url>
@@ -85,20 +90,14 @@
   </url>
   
   <url>
-    <loc>https://xpzouying.github.io/tags/code/</loc>
-    <lastmod>2018-11-26T21:52:25+08:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
     <loc>https://xpzouying.github.io/categories/code/</loc>
     <lastmod>2018-11-26T21:52:25+08:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>https://xpzouying.github.io/tags/life/</loc>
-    <lastmod>2018-11-14T09:23:24+08:00</lastmod>
+    <loc>https://xpzouying.github.io/tags/code/</loc>
+    <lastmod>2018-11-26T21:52:25+08:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -109,8 +108,14 @@
   </url>
   
   <url>
+    <loc>https://xpzouying.github.io/tags/life/</loc>
+    <lastmod>2018-11-14T09:23:24+08:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
     <loc>https://xpzouying.github.io/post/</loc>
-    <lastmod>2018-12-16T17:57:03+08:00</lastmod>
+    <lastmod>2018-12-21T20:31:19+08:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -128,7 +133,7 @@
   
   <url>
     <loc>https://xpzouying.github.io/</loc>
-    <lastmod>2018-12-16T17:57:03+08:00</lastmod>
+    <lastmod>2018-12-21T20:31:19+08:00</lastmod>
     <priority>0</priority>
   </url>
   

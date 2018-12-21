@@ -6,10 +6,26 @@
     <description>Recent content in Posts on zouying.is</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cmn-Hans</language>
-    <lastBuildDate>Sun, 16 Dec 2018 17:57:03 +0800</lastBuildDate>
+    <lastBuildDate>Fri, 21 Dec 2018 20:31:19 +0800</lastBuildDate>
     
 	<atom:link href="https://xpzouying.github.io/post/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>How_to_contributing</title>
+      <link>https://xpzouying.github.io/post/how_to_contributing/</link>
+      <pubDate>Fri, 21 Dec 2018 20:31:19 +0800</pubDate>
+      
+      <guid>https://xpzouying.github.io/post/how_to_contributing/</guid>
+      <description>Contributing 以Gitlab为例，github也类似。
+流程  发现BUG / 缺少Feature 创建Issue 提交Pull Request (PR)  发现BUG / 缺少Feature 正常流程为：
+ 发现bug/feature后，去issue list中搜索，或者jira/trello中搜索，看看是否已经有相应项目。 由于团队规模小、项目小，可以直接与对应的人员沟通后，提交新的issue或需求。后面会详细介绍issue/proposal的写法。 若提交issue的同学想解决该问题，那么就可以进入：开发、自测到发出Pull Request的流程。  创建issue 如何创建一个合理的issue/proposal。
+创建Proposal
+找到项目的相关人员，“拉群、组会、面聊、。。。”，提出相应的想法。如果Proposal被采纳后，创建对应的需求issue，描述出详细的功能需求、业务场景、优先级程度等等。创建issue或者需求列表的目的主要是为了让所有人可以知晓以及事后查阅。
+创建issue
+描述issue的示例，以go contributing为例，提交issue时，附带如下问题回答，
+  What version of Go are you using (go version)? What operating system and processor architecture are you using? What did you do? What did you expect to see? What did you see instead?   对应的go issue，issues 20</description>
+    </item>
     
     <item>
       <title>两周JS学习历程</title>
@@ -17,11 +33,13 @@
       <pubDate>Sun, 16 Dec 2018 17:57:03 +0800</pubDate>
       
       <guid>https://xpzouying.github.io/post/two_week_learning_js/</guid>
-      <description>&lt;p&gt;通过这篇文章，我将记录自己在2018年剩下两周左右的时间内，系统的、强化的学习两周的Javascript，弥补技术栈中最薄弱的前端知识。&lt;/p&gt;
+      <description>&lt;p&gt;通过这篇文章，我将记录自己在2019年开始的两周左右的时间内，系统的、强化的学习两周的Javascript，弥补技术栈中最薄弱的前端知识。&lt;/p&gt;
 
 &lt;h3 id=&#34;小目标&#34;&gt;小目标：&lt;/h3&gt;
 
-&lt;p&gt;希望能够通过两周的学习，能够做出一个较好的展示页面出来。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;时间周期：&lt;/strong&gt;2019年1月1日 - 2019年1月13日&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;预期成果：&lt;/strong&gt;希望能够通过两周的学习，能够做出一个较好的展示页面出来。&lt;/p&gt;
 
 &lt;h3 id=&#34;工程展示&#34;&gt;工程展示&lt;/h3&gt;
 
