@@ -6,10 +6,19 @@
     <description>Recent content on zouying.is</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cmn-Hans</language>
-    <lastBuildDate>Tue, 01 Jan 2019 21:34:50 +0800</lastBuildDate>
+    <lastBuildDate>Sun, 03 Feb 2019 21:34:50 +0800</lastBuildDate>
     
 	<atom:link href="https://xpzouying.github.io/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Reading_notebook_201902</title>
+      <link>https://xpzouying.github.io/post/reading_notebook_201902/</link>
+      <pubDate>Sun, 03 Feb 2019 21:34:50 +0800</pubDate>
+      
+      <guid>https://xpzouying.github.io/post/reading_notebook_201902/</guid>
+      <description>&lt;p&gt;Habit One: reading&lt;/p&gt;</description>
+    </item>
     
     <item>
       <title>Reading_notebook_201901</title>
@@ -17,9 +26,7 @@
       <pubDate>Tue, 01 Jan 2019 21:34:50 +0800</pubDate>
       
       <guid>https://xpzouying.github.io/post/reading_notebook_201901/</guid>
-      <description>&lt;p&gt;Habit One: reading&lt;/p&gt;
-
-&lt;p&gt;&lt;/p&gt;</description>
+      <description>&lt;p&gt;Habit One: reading&lt;/p&gt;</description>
     </item>
     
     <item>
@@ -58,9 +65,7 @@
 
 &lt;ul&gt;
 &lt;li&gt;&lt;a href=&#34;https://github.com/xpzouying/learning_fontend&#34;&gt;https://github.com/xpzouying/learning_fontend&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;&lt;/p&gt;</description>
+&lt;/ul&gt;</description>
     </item>
     
     <item>
@@ -69,9 +74,7 @@
       <pubDate>Sat, 08 Dec 2018 21:38:55 +0800</pubDate>
       
       <guid>https://xpzouying.github.io/post/reading_notebook_201812/</guid>
-      <description>&lt;p&gt;Habit One: reading&lt;/p&gt;
-
-&lt;p&gt;&lt;/p&gt;</description>
+      <description>&lt;p&gt;Habit One: reading&lt;/p&gt;</description>
     </item>
     
     <item>
@@ -92,9 +95,7 @@ coder@face++
       
       <guid>https://xpzouying.github.io/post/dive_into_beego_router/</guid>
       <description>&lt;p&gt;上一次分析了默认的http server以及router的工作方式。
-本文开始解析beego的router过程。&lt;/p&gt;
-
-&lt;p&gt;&lt;/p&gt;</description>
+本文开始解析beego的router过程。&lt;/p&gt;</description>
     </item>
     
     <item>
@@ -105,9 +106,7 @@ coder@face++
       <guid>https://xpzouying.github.io/post/dive_into_http_router_02/</guid>
       <description>&lt;h1 id=&#34;day-2&#34;&gt;Day 2&lt;/h1&gt;
 
-&lt;p&gt;http注册一个http处理函数的过程为：&lt;/p&gt;
-
-&lt;p&gt;&lt;/p&gt;</description>
+&lt;p&gt;http注册一个http处理函数的过程为：&lt;/p&gt;</description>
     </item>
     
     <item>
@@ -130,9 +129,7 @@ coder@face++
 &lt;li&gt;&lt;p&gt;我们如何实现一个自定义的router&lt;/p&gt;&lt;/li&gt;
 
 &lt;li&gt;&lt;p&gt;我们如何在自定义的router上面完成我们想要的各种功能：高效率、Middleware、异常捕获及处理、如何简单的完成JSON类型的返回等等&lt;/p&gt;&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;&lt;/p&gt;</description>
+&lt;/ol&gt;</description>
     </item>
     
     <item>
@@ -141,9 +138,7 @@ coder@face++
       <pubDate>Mon, 19 Nov 2018 09:44:58 +0800</pubDate>
       
       <guid>https://xpzouying.github.io/post/dive_into_src_plan/</guid>
-      <description>&lt;p&gt;之前制定了阅读计划，每天阅读25页书。&lt;/p&gt;
-
-&lt;p&gt;&lt;/p&gt;</description>
+      <description>&lt;p&gt;之前制定了阅读计划，每天阅读25页书。&lt;/p&gt;</description>
     </item>
     
     <item>
@@ -152,9 +147,7 @@ coder@face++
       <pubDate>Wed, 14 Nov 2018 09:23:24 +0800</pubDate>
       
       <guid>https://xpzouying.github.io/post/reading_notebook_201811/</guid>
-      <description>&lt;p&gt;Habit One: reading&lt;/p&gt;
-
-&lt;p&gt;&lt;/p&gt;</description>
+      <description>&lt;p&gt;Habit One: reading&lt;/p&gt;</description>
     </item>
     
     <item>
@@ -163,9 +156,7 @@ coder@face++
       <pubDate>Tue, 14 Aug 2018 10:25:52 +0800</pubDate>
       
       <guid>https://xpzouying.github.io/post/reading_notebook_201810/</guid>
-      <description>&lt;p&gt;Habit One: reading&lt;/p&gt;
-
-&lt;p&gt;&lt;/p&gt;</description>
+      <description>&lt;p&gt;Habit One: reading&lt;/p&gt;</description>
     </item>
     
     <item>
@@ -174,9 +165,7 @@ coder@face++
       <pubDate>Tue, 14 Aug 2018 10:25:52 +0800</pubDate>
       
       <guid>https://xpzouying.github.io/post/reading_notebook_201808/</guid>
-      <description>&lt;p&gt;Habit One: reading&lt;/p&gt;
-
-&lt;p&gt;&lt;/p&gt;</description>
+      <description>&lt;p&gt;Habit One: reading&lt;/p&gt;</description>
     </item>
     
     <item>
@@ -185,9 +174,7 @@ coder@face++
       <pubDate>Tue, 14 Aug 2018 10:25:52 +0800</pubDate>
       
       <guid>https://xpzouying.github.io/post/reading_notebook_201809/</guid>
-      <description>&lt;p&gt;Habit One: reading&lt;/p&gt;
-
-&lt;p&gt;&lt;/p&gt;</description>
+      <description>&lt;p&gt;Habit One: reading&lt;/p&gt;</description>
     </item>
     
     <item>

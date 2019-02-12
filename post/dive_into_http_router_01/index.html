@@ -41,7 +41,7 @@
 
     
 
-    <meta name="generator" content="Hugo 0.50" />
+    <meta name="generator" content="Hugo 0.53" />
   </head>
 
   <body class="">
@@ -95,8 +95,6 @@
 <li><p>我们如何在自定义的router上面完成我们想要的各种功能：高效率、Middleware、异常捕获及处理、如何简单的完成JSON类型的返回等等</p></li>
 </ol>
 
-<p></p>
-
 <h2 id="demo">DEMO</h2>
 
 <p>首先看golang默认的http router是如何工作的。</p>
@@ -111,33 +109,33 @@
 	<span class="s">&#34;net/http&#34;</span>
 <span class="p">)</span>
 
-<span class="kd">func</span> <span class="nx">fooHandler</span><span class="p">(</span><span class="nx">w</span> <span class="nx">http</span><span class="p">.</span><span class="nx">ResponseWriter</span><span class="p">,</span> <span class="nx">r</span> <span class="o">*</span><span class="nx">http</span><span class="p">.</span><span class="nx">Request</span><span class="p">)</span> <span class="p">{</span>
-	<span class="nx">fmt</span><span class="p">.</span><span class="nx">Fprintf</span><span class="p">(</span><span class="nx">w</span><span class="p">,</span> <span class="s">&#34;Hello, %q&#34;</span><span class="p">,</span> <span class="nx">html</span><span class="p">.</span><span class="nx">EscapeString</span><span class="p">(</span><span class="nx">r</span><span class="p">.</span><span class="nx">URL</span><span class="p">.</span><span class="nx">Path</span><span class="p">))</span>
+<span class="kd">func</span> <span class="nf">fooHandler</span><span class="p">(</span><span class="nx">w</span> <span class="nx">http</span><span class="p">.</span><span class="nx">ResponseWriter</span><span class="p">,</span> <span class="nx">r</span> <span class="o">*</span><span class="nx">http</span><span class="p">.</span><span class="nx">Request</span><span class="p">)</span> <span class="p">{</span>
+	<span class="nx">fmt</span><span class="p">.</span><span class="nf">Fprintf</span><span class="p">(</span><span class="nx">w</span><span class="p">,</span> <span class="s">&#34;Hello, %q&#34;</span><span class="p">,</span> <span class="nx">html</span><span class="p">.</span><span class="nf">EscapeString</span><span class="p">(</span><span class="nx">r</span><span class="p">.</span><span class="nx">URL</span><span class="p">.</span><span class="nx">Path</span><span class="p">))</span>
 <span class="p">}</span>
 
-<span class="kd">func</span> <span class="nx">main</span><span class="p">()</span> <span class="p">{</span>
-	<span class="nx">http</span><span class="p">.</span><span class="nx">HandleFunc</span><span class="p">(</span><span class="s">&#34;/foo&#34;</span><span class="p">,</span> <span class="nx">fooHandler</span><span class="p">)</span>
+<span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+	<span class="nx">http</span><span class="p">.</span><span class="nf">HandleFunc</span><span class="p">(</span><span class="s">&#34;/foo&#34;</span><span class="p">,</span> <span class="nx">fooHandler</span><span class="p">)</span>
 
-	<span class="nx">http</span><span class="p">.</span><span class="nx">HandleFunc</span><span class="p">(</span><span class="s">&#34;/bar&#34;</span><span class="p">,</span> <span class="kd">func</span><span class="p">(</span><span class="nx">w</span> <span class="nx">http</span><span class="p">.</span><span class="nx">ResponseWriter</span><span class="p">,</span> <span class="nx">r</span> <span class="o">*</span><span class="nx">http</span><span class="p">.</span><span class="nx">Request</span><span class="p">)</span> <span class="p">{</span>
-		<span class="nx">fmt</span><span class="p">.</span><span class="nx">Fprintf</span><span class="p">(</span><span class="nx">w</span><span class="p">,</span> <span class="s">&#34;Hello, %q&#34;</span><span class="p">,</span> <span class="nx">html</span><span class="p">.</span><span class="nx">EscapeString</span><span class="p">(</span><span class="nx">r</span><span class="p">.</span><span class="nx">URL</span><span class="p">.</span><span class="nx">Path</span><span class="p">))</span>
+	<span class="nx">http</span><span class="p">.</span><span class="nf">HandleFunc</span><span class="p">(</span><span class="s">&#34;/bar&#34;</span><span class="p">,</span> <span class="kd">func</span><span class="p">(</span><span class="nx">w</span> <span class="nx">http</span><span class="p">.</span><span class="nx">ResponseWriter</span><span class="p">,</span> <span class="nx">r</span> <span class="o">*</span><span class="nx">http</span><span class="p">.</span><span class="nx">Request</span><span class="p">)</span> <span class="p">{</span>
+		<span class="nx">fmt</span><span class="p">.</span><span class="nf">Fprintf</span><span class="p">(</span><span class="nx">w</span><span class="p">,</span> <span class="s">&#34;Hello, %q&#34;</span><span class="p">,</span> <span class="nx">html</span><span class="p">.</span><span class="nf">EscapeString</span><span class="p">(</span><span class="nx">r</span><span class="p">.</span><span class="nx">URL</span><span class="p">.</span><span class="nx">Path</span><span class="p">))</span>
 	<span class="p">})</span>
 
-	<span class="nx">log</span><span class="p">.</span><span class="nx">Fatal</span><span class="p">(</span><span class="nx">http</span><span class="p">.</span><span class="nx">ListenAndServe</span><span class="p">(</span><span class="s">&#34;:8080&#34;</span><span class="p">,</span> <span class="kc">nil</span><span class="p">))</span>
+	<span class="nx">log</span><span class="p">.</span><span class="nf">Fatal</span><span class="p">(</span><span class="nx">http</span><span class="p">.</span><span class="nf">ListenAndServe</span><span class="p">(</span><span class="s">&#34;:8080&#34;</span><span class="p">,</span> <span class="kc">nil</span><span class="p">))</span>
 <span class="p">}</span></code></pre></div>
 <p>运行：</p>
 <div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">go run main.go</code></pre></div>
 <p>调用：</p>
 <div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">curl http://localhost:8080/foo
 
-<span class="c1"># Hello, &#34;/foo&#34;
-</span><span class="c1"></span>
+<span class="c1"># Hello, &#34;/foo&#34;</span>
+
 curl http://localhost:8080/bar
 
-<span class="c1"># Hello, &#34;/bar&#34;
-</span><span class="c1"></span>
+<span class="c1"># Hello, &#34;/bar&#34;</span>
+
 curl http://localhost:8080/
 
-# <span class="m">404</span> page not found</code></pre></div>
+<span class="c1"># 404 page not found</span></code></pre></div>
 <h2 id="现象">现象</h2>
 
 <ol>
@@ -170,9 +168,9 @@ curl http://localhost:8080/
 </span><span class="c1">// The handler is typically nil, in which case the DefaultServeMux is used.
 </span><span class="c1">//
 </span><span class="c1">// ListenAndServe always returns a non-nil error.
-</span><span class="c1"></span><span class="kd">func</span> <span class="nx">ListenAndServe</span><span class="p">(</span><span class="nx">addr</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">handler</span> <span class="nx">Handler</span><span class="p">)</span> <span class="kt">error</span> <span class="p">{</span>
+</span><span class="c1"></span><span class="kd">func</span> <span class="nf">ListenAndServe</span><span class="p">(</span><span class="nx">addr</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">handler</span> <span class="nx">Handler</span><span class="p">)</span> <span class="kt">error</span> <span class="p">{</span>
 	<span class="nx">server</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">Server</span><span class="p">{</span><span class="nx">Addr</span><span class="p">:</span> <span class="nx">addr</span><span class="p">,</span> <span class="nx">Handler</span><span class="p">:</span> <span class="nx">handler</span><span class="p">}</span>
-	<span class="k">return</span> <span class="nx">server</span><span class="p">.</span><span class="nx">ListenAndServe</span><span class="p">()</span>
+	<span class="k">return</span> <span class="nx">server</span><span class="p">.</span><span class="nf">ListenAndServe</span><span class="p">()</span>
 <span class="p">}</span></code></pre></div>
 <p><code>ListenAndServe</code>从注释上可以看到主要做了两个工作：</p>
 

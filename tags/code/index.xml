@@ -18,9 +18,7 @@
       
       <guid>https://xpzouying.github.io/post/dive_into_beego_router/</guid>
       <description>&lt;p&gt;上一次分析了默认的http server以及router的工作方式。
-本文开始解析beego的router过程。&lt;/p&gt;
-
-&lt;p&gt;&lt;/p&gt;</description>
+本文开始解析beego的router过程。&lt;/p&gt;</description>
     </item>
     
     <item>
@@ -31,9 +29,7 @@
       <guid>https://xpzouying.github.io/post/dive_into_http_router_02/</guid>
       <description>&lt;h1 id=&#34;day-2&#34;&gt;Day 2&lt;/h1&gt;
 
-&lt;p&gt;http注册一个http处理函数的过程为：&lt;/p&gt;
-
-&lt;p&gt;&lt;/p&gt;</description>
+&lt;p&gt;http注册一个http处理函数的过程为：&lt;/p&gt;</description>
     </item>
     
     <item>
@@ -56,9 +52,7 @@
 &lt;li&gt;&lt;p&gt;我们如何实现一个自定义的router&lt;/p&gt;&lt;/li&gt;
 
 &lt;li&gt;&lt;p&gt;我们如何在自定义的router上面完成我们想要的各种功能：高效率、Middleware、异常捕获及处理、如何简单的完成JSON类型的返回等等&lt;/p&gt;&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;&lt;/p&gt;</description>
+&lt;/ol&gt;</description>
     </item>
     
     <item>
@@ -67,9 +61,7 @@
       <pubDate>Mon, 19 Nov 2018 09:44:58 +0800</pubDate>
       
       <guid>https://xpzouying.github.io/post/dive_into_src_plan/</guid>
-      <description>&lt;p&gt;之前制定了阅读计划，每天阅读25页书。&lt;/p&gt;
-
-&lt;p&gt;&lt;/p&gt;</description>
+      <description>&lt;p&gt;之前制定了阅读计划，每天阅读25页书。&lt;/p&gt;</description>
     </item>
     
   </channel>

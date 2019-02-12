@@ -41,7 +41,7 @@
 
     
 
-    <meta name="generator" content="Hugo 0.50" />
+    <meta name="generator" content="Hugo 0.53" />
   </head>
 
   <body class="">
@@ -83,14 +83,13 @@
 
 <p>http注册一个http处理函数的过程为：</p>
 
-<p></p>
-<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="nx">http</span><span class="p">.</span><span class="nx">HandleFunc</span><span class="p">(</span><span class="s">&#34;/foo&#34;</span><span class="p">,</span> <span class="nx">fooHandler</span><span class="p">)</span></code></pre></div>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="nx">http</span><span class="p">.</span><span class="nf">HandleFunc</span><span class="p">(</span><span class="s">&#34;/foo&#34;</span><span class="p">,</span> <span class="nx">fooHandler</span><span class="p">)</span></code></pre></div>
 <p>查看源码为，</p>
 <div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// HandleFunc registers the handler function for the given pattern
 </span><span class="c1">// in the DefaultServeMux.
 </span><span class="c1">// The documentation for ServeMux explains how patterns are matched.
-</span><span class="c1"></span><span class="kd">func</span> <span class="nx">HandleFunc</span><span class="p">(</span><span class="nx">pattern</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">handler</span> <span class="kd">func</span><span class="p">(</span><span class="nx">ResponseWriter</span><span class="p">,</span> <span class="o">*</span><span class="nx">Request</span><span class="p">))</span> <span class="p">{</span>
-	<span class="nx">DefaultServeMux</span><span class="p">.</span><span class="nx">HandleFunc</span><span class="p">(</span><span class="nx">pattern</span><span class="p">,</span> <span class="nx">handler</span><span class="p">)</span>
+</span><span class="c1"></span><span class="kd">func</span> <span class="nf">HandleFunc</span><span class="p">(</span><span class="nx">pattern</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">handler</span> <span class="kd">func</span><span class="p">(</span><span class="nx">ResponseWriter</span><span class="p">,</span> <span class="o">*</span><span class="nx">Request</span><span class="p">))</span> <span class="p">{</span>
+	<span class="nx">DefaultServeMux</span><span class="p">.</span><span class="nf">HandleFunc</span><span class="p">(</span><span class="nx">pattern</span><span class="p">,</span> <span class="nx">handler</span><span class="p">)</span>
 <span class="p">}</span></code></pre></div>
 <p>HandleFunc函数的作用就是把一个处理函数注册按照特定的模式注册给默认的DefaultServeMux。</p>
 
@@ -98,14 +97,14 @@
 <div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="nx">handler</span> <span class="kd">func</span><span class="p">(</span><span class="nx">ResponseWriter</span><span class="p">,</span> <span class="o">*</span><span class="nx">Request</span><span class="p">)</span></code></pre></div>
 <p>在函数里面展示了如何把一个制定的HandlerFunc绑定到DefaultServeMux上。</p>
 <div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// HandleFunc registers the handler function for the given pattern.
-</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">mux</span> <span class="o">*</span><span class="nx">ServeMux</span><span class="p">)</span> <span class="nx">HandleFunc</span><span class="p">(</span><span class="nx">pattern</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">handler</span> <span class="kd">func</span><span class="p">(</span><span class="nx">ResponseWriter</span><span class="p">,</span> <span class="o">*</span><span class="nx">Request</span><span class="p">))</span> <span class="p">{</span>
+</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">mux</span> <span class="o">*</span><span class="nx">ServeMux</span><span class="p">)</span> <span class="nf">HandleFunc</span><span class="p">(</span><span class="nx">pattern</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">handler</span> <span class="kd">func</span><span class="p">(</span><span class="nx">ResponseWriter</span><span class="p">,</span> <span class="o">*</span><span class="nx">Request</span><span class="p">))</span> <span class="p">{</span>
     <span class="c1">// ...
-</span><span class="c1"></span>	<span class="nx">mux</span><span class="p">.</span><span class="nx">Handle</span><span class="p">(</span><span class="nx">pattern</span><span class="p">,</span> <span class="nx">HandlerFunc</span><span class="p">(</span><span class="nx">handler</span><span class="p">))</span>
+</span><span class="c1"></span>	<span class="nx">mux</span><span class="p">.</span><span class="nf">Handle</span><span class="p">(</span><span class="nx">pattern</span><span class="p">,</span> <span class="nf">HandlerFunc</span><span class="p">(</span><span class="nx">handler</span><span class="p">))</span>
 <span class="p">}</span></code></pre></div>
 <p>继续进入mux.Handle分析，</p>
 <div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// Handle registers the handler for the given pattern.
 </span><span class="c1">// If a handler already exists for pattern, Handle panics.
-</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">mux</span> <span class="o">*</span><span class="nx">ServeMux</span><span class="p">)</span> <span class="nx">Handle</span><span class="p">(</span><span class="nx">pattern</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">handler</span> <span class="nx">Handler</span><span class="p">)</span> <span class="p">{</span>
+</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">mux</span> <span class="o">*</span><span class="nx">ServeMux</span><span class="p">)</span> <span class="nf">Handle</span><span class="p">(</span><span class="nx">pattern</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">handler</span> <span class="nx">Handler</span><span class="p">)</span> <span class="p">{</span>
     <span class="c1">// ...
 </span><span class="c1"></span>	<span class="nx">mux</span><span class="p">.</span><span class="nx">m</span><span class="p">[</span><span class="nx">pattern</span><span class="p">]</span> <span class="p">=</span> <span class="nx">muxEntry</span><span class="p">{</span><span class="nx">h</span><span class="p">:</span> <span class="nx">handler</span><span class="p">,</span> <span class="nx">pattern</span><span class="p">:</span> <span class="nx">pattern</span><span class="p">}</span>
 	<span class="c1">// ...
@@ -146,9 +145,9 @@
 <p>通过内部的<code>net/http</code>包中提供的方法<code>http.ListenAndServe(&quot;:8080&quot;, nil)</code>即可进行监听提供服务。</p>
 
 <h3 id="http-listenandserve方法">http.ListenAndServe方法</h3>
-<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="nx">ListenAndServe</span><span class="p">(</span><span class="nx">addr</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">handler</span> <span class="nx">Handler</span><span class="p">)</span> <span class="kt">error</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="nf">ListenAndServe</span><span class="p">(</span><span class="nx">addr</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">handler</span> <span class="nx">Handler</span><span class="p">)</span> <span class="kt">error</span> <span class="p">{</span>
 	<span class="nx">server</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">Server</span><span class="p">{</span><span class="nx">Addr</span><span class="p">:</span> <span class="nx">addr</span><span class="p">,</span> <span class="nx">Handler</span><span class="p">:</span> <span class="nx">handler</span><span class="p">}</span>
-	<span class="k">return</span> <span class="nx">server</span><span class="p">.</span><span class="nx">ListenAndServe</span><span class="p">()</span>
+	<span class="k">return</span> <span class="nx">server</span><span class="p">.</span><span class="nf">ListenAndServe</span><span class="p">()</span>
 <span class="p">}</span></code></pre></div>
 <p>前面已经分析过该函数，这个函数就是创建一个Server，监听（listen）入参地址addr，等待连接。</p>
 
@@ -172,7 +171,7 @@
 <p>其中的Handler是一个重点。</p>
 <div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// A Handler responds to an HTTP request.
 </span><span class="c1"></span><span class="kd">type</span> <span class="nx">Handler</span> <span class="kd">interface</span> <span class="p">{</span>
-	<span class="nx">ServeHTTP</span><span class="p">(</span><span class="nx">ResponseWriter</span><span class="p">,</span> <span class="o">*</span><span class="nx">Request</span><span class="p">)</span>
+	<span class="nf">ServeHTTP</span><span class="p">(</span><span class="nx">ResponseWriter</span><span class="p">,</span> <span class="o">*</span><span class="nx">Request</span><span class="p">)</span>
 <span class="p">}</span></code></pre></div>
 <p>Handler是一个interface，约定了处理HTTP request的接口。</p>
 
@@ -188,10 +187,10 @@
 <div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// ListenAndServe listens on the TCP network address srv.Addr and then
 </span><span class="c1">// calls Serve to handle requests on incoming connections.
 </span><span class="c1">// ...
-</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">srv</span> <span class="o">*</span><span class="nx">Server</span><span class="p">)</span> <span class="nx">ListenAndServe</span><span class="p">()</span> <span class="kt">error</span> <span class="p">{</span>
-	<span class="nx">ln</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">net</span><span class="p">.</span><span class="nx">Listen</span><span class="p">(</span><span class="s">&#34;tcp&#34;</span><span class="p">,</span> <span class="nx">addr</span><span class="p">)</span>
+</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">srv</span> <span class="o">*</span><span class="nx">Server</span><span class="p">)</span> <span class="nf">ListenAndServe</span><span class="p">()</span> <span class="kt">error</span> <span class="p">{</span>
+	<span class="nx">ln</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">net</span><span class="p">.</span><span class="nf">Listen</span><span class="p">(</span><span class="s">&#34;tcp&#34;</span><span class="p">,</span> <span class="nx">addr</span><span class="p">)</span>
 	<span class="c1">// ...
-</span><span class="c1"></span>	<span class="k">return</span> <span class="nx">srv</span><span class="p">.</span><span class="nx">Serve</span><span class="p">(</span><span class="nx">tcpKeepAliveListener</span><span class="p">{</span><span class="nx">ln</span><span class="p">.(</span><span class="o">*</span><span class="nx">net</span><span class="p">.</span><span class="nx">TCPListener</span><span class="p">)})</span>
+</span><span class="c1"></span>	<span class="k">return</span> <span class="nx">srv</span><span class="p">.</span><span class="nf">Serve</span><span class="p">(</span><span class="nx">tcpKeepAliveListener</span><span class="p">{</span><span class="nx">ln</span><span class="p">.(</span><span class="o">*</span><span class="nx">net</span><span class="p">.</span><span class="nx">TCPListener</span><span class="p">)})</span>
 <span class="p">}</span></code></pre></div>
 <p>该函数主要做了如下两步操作，</p>
 
@@ -205,14 +204,14 @@
 </span><span class="c1">// Multiple goroutines may invoke methods on a Listener simultaneously.
 </span><span class="c1"></span><span class="kd">type</span> <span class="nx">Listener</span> <span class="kd">interface</span> <span class="p">{</span>
 	<span class="c1">// Accept waits for and returns the next connection to the listener.
-</span><span class="c1"></span>	<span class="nx">Accept</span><span class="p">()</span> <span class="p">(</span><span class="nx">Conn</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span>
+</span><span class="c1"></span>	<span class="nf">Accept</span><span class="p">()</span> <span class="p">(</span><span class="nx">Conn</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span>
 
 	<span class="c1">// Close closes the listener.
 </span><span class="c1"></span>	<span class="c1">// Any blocked Accept operations will be unblocked and return errors.
-</span><span class="c1"></span>	<span class="nx">Close</span><span class="p">()</span> <span class="kt">error</span>
+</span><span class="c1"></span>	<span class="nf">Close</span><span class="p">()</span> <span class="kt">error</span>
 
 	<span class="c1">// Addr returns the listener&#39;s network address.
-</span><span class="c1"></span>	<span class="nx">Addr</span><span class="p">()</span> <span class="nx">Addr</span>
+</span><span class="c1"></span>	<span class="nf">Addr</span><span class="p">()</span> <span class="nx">Addr</span>
 <span class="p">}</span></code></pre></div>
 <ol>
 <li><code>srv.Serve(tcpKeepAliveListener{ln.(*net.TCPListener)})</code>：首先是将<code>ln</code>由<code>Listener</code>断言为<code>TCPListener</code>，具体作用现在还不确定，但这可以理解，因为我们是使用TCP进行监听。另外使用<code>tcpKeepAliveListener</code>封装了一下，具体作用先不深入调查，从命名看猜测可能是加入了一些Keep-Alive相关的参数设置。</li>
@@ -223,14 +222,14 @@
 </span><span class="c1">// new service goroutine for each. The service goroutines read requests and
 </span><span class="c1">// then call srv.Handler to reply to them.
 </span><span class="c1">// ...
-</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">srv</span> <span class="o">*</span><span class="nx">Server</span><span class="p">)</span> <span class="nx">Serve</span><span class="p">(</span><span class="nx">l</span> <span class="nx">net</span><span class="p">.</span><span class="nx">Listener</span><span class="p">)</span> <span class="kt">error</span> <span class="p">{</span>
+</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">srv</span> <span class="o">*</span><span class="nx">Server</span><span class="p">)</span> <span class="nf">Serve</span><span class="p">(</span><span class="nx">l</span> <span class="nx">net</span><span class="p">.</span><span class="nx">Listener</span><span class="p">)</span> <span class="kt">error</span> <span class="p">{</span>
 	<span class="c1">// ...
 </span><span class="c1"></span>	<span class="k">for</span> <span class="p">{</span>
-		<span class="nx">rw</span><span class="p">,</span> <span class="nx">e</span> <span class="o">:=</span> <span class="nx">l</span><span class="p">.</span><span class="nx">Accept</span><span class="p">()</span>
+		<span class="nx">rw</span><span class="p">,</span> <span class="nx">e</span> <span class="o">:=</span> <span class="nx">l</span><span class="p">.</span><span class="nf">Accept</span><span class="p">()</span>
 		<span class="c1">// ...
-</span><span class="c1"></span>		<span class="nx">c</span> <span class="o">:=</span> <span class="nx">srv</span><span class="p">.</span><span class="nx">newConn</span><span class="p">(</span><span class="nx">rw</span><span class="p">)</span>
-		<span class="nx">c</span><span class="p">.</span><span class="nx">setState</span><span class="p">(</span><span class="nx">c</span><span class="p">.</span><span class="nx">rwc</span><span class="p">,</span> <span class="nx">StateNew</span><span class="p">)</span> <span class="c1">// before Serve can return
-</span><span class="c1"></span>		<span class="k">go</span> <span class="nx">c</span><span class="p">.</span><span class="nx">serve</span><span class="p">(</span><span class="nx">ctx</span><span class="p">)</span>
+</span><span class="c1"></span>		<span class="nx">c</span> <span class="o">:=</span> <span class="nx">srv</span><span class="p">.</span><span class="nf">newConn</span><span class="p">(</span><span class="nx">rw</span><span class="p">)</span>
+		<span class="nx">c</span><span class="p">.</span><span class="nf">setState</span><span class="p">(</span><span class="nx">c</span><span class="p">.</span><span class="nx">rwc</span><span class="p">,</span> <span class="nx">StateNew</span><span class="p">)</span> <span class="c1">// before Serve can return
+</span><span class="c1"></span>		<span class="k">go</span> <span class="nx">c</span><span class="p">.</span><span class="nf">serve</span><span class="p">(</span><span class="nx">ctx</span><span class="p">)</span>
 	<span class="p">}</span>
 <span class="p">}</span></code></pre></div>
 <p>Serve的工作就是从监听的Listener得到一个连接，然后创建一个goroutine来处理这个请求。该goroutine会读取这个request，然后调用Server中的Handler对进来的（incoming）请求进行处理。</p>
@@ -242,17 +241,17 @@
 <p>在一个for循环中，使用Accept()等待一个连接Conn。其中Conn为interface，是一个通用的数据流的网络连接interface。我们可以从Conn进行Read和Write。</p>
 <div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// Conn is a generic stream-oriented network connection.
 </span><span class="c1"></span><span class="kd">type</span> <span class="nx">Conn</span> <span class="kd">interface</span> <span class="p">{</span>
-	<span class="nx">Read</span><span class="p">(</span><span class="nx">b</span> <span class="p">[]</span><span class="kt">byte</span><span class="p">)</span> <span class="p">(</span><span class="nx">n</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">err</span> <span class="kt">error</span><span class="p">)</span>
-	<span class="nx">Write</span><span class="p">(</span><span class="nx">b</span> <span class="p">[]</span><span class="kt">byte</span><span class="p">)</span> <span class="p">(</span><span class="nx">n</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">err</span> <span class="kt">error</span><span class="p">)</span>
+	<span class="nf">Read</span><span class="p">(</span><span class="nx">b</span> <span class="p">[]</span><span class="kt">byte</span><span class="p">)</span> <span class="p">(</span><span class="nx">n</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">err</span> <span class="kt">error</span><span class="p">)</span>
+	<span class="nf">Write</span><span class="p">(</span><span class="nx">b</span> <span class="p">[]</span><span class="kt">byte</span><span class="p">)</span> <span class="p">(</span><span class="nx">n</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">err</span> <span class="kt">error</span><span class="p">)</span>
 	<span class="c1">// ...
 </span><span class="c1"></span><span class="p">}</span></code></pre></div>
 <p>Serve中将监听到的Conn进一步使用conn封装了一个新的连接，该连接是一个server side的HTTP连接。该server端的连接应该很重要，做一个TODO，后面详细分析为什么需要建立这个server端的连接。</p>
 
 <p>当建立这个server端的连接后，开启一个goroutine对这个连接进行<code>serve()</code>操作。</p>
 <div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// Serve a new connection.
-</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">c</span> <span class="o">*</span><span class="nx">conn</span><span class="p">)</span> <span class="nx">serve</span><span class="p">(</span><span class="nx">ctx</span> <span class="nx">context</span><span class="p">.</span><span class="nx">Context</span><span class="p">)</span> <span class="p">{</span>
-	<span class="nx">c</span><span class="p">.</span><span class="nx">remoteAddr</span> <span class="p">=</span> <span class="nx">c</span><span class="p">.</span><span class="nx">rwc</span><span class="p">.</span><span class="nx">RemoteAddr</span><span class="p">().</span><span class="nx">String</span><span class="p">()</span>
-	<span class="nx">ctx</span> <span class="p">=</span> <span class="nx">context</span><span class="p">.</span><span class="nx">WithValue</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span> <span class="nx">LocalAddrContextKey</span><span class="p">,</span> <span class="nx">c</span><span class="p">.</span><span class="nx">rwc</span><span class="p">.</span><span class="nx">LocalAddr</span><span class="p">())</span>
+</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">c</span> <span class="o">*</span><span class="nx">conn</span><span class="p">)</span> <span class="nf">serve</span><span class="p">(</span><span class="nx">ctx</span> <span class="nx">context</span><span class="p">.</span><span class="nx">Context</span><span class="p">)</span> <span class="p">{</span>
+	<span class="nx">c</span><span class="p">.</span><span class="nx">remoteAddr</span> <span class="p">=</span> <span class="nx">c</span><span class="p">.</span><span class="nx">rwc</span><span class="p">.</span><span class="nf">RemoteAddr</span><span class="p">().</span><span class="nf">String</span><span class="p">()</span>
+	<span class="nx">ctx</span> <span class="p">=</span> <span class="nx">context</span><span class="p">.</span><span class="nf">WithValue</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span> <span class="nx">LocalAddrContextKey</span><span class="p">,</span> <span class="nx">c</span><span class="p">.</span><span class="nx">rwc</span><span class="p">.</span><span class="nf">LocalAddr</span><span class="p">())</span>
 	<span class="k">defer</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
 		<span class="c1">// 异常panic处理
 </span><span class="c1"></span>	<span class="p">}()</span>
@@ -261,16 +260,16 @@
 </span><span class="c1"></span>
 	<span class="c1">// HTTP/1.x from here on.
 </span><span class="c1"></span>
-	<span class="nx">ctx</span><span class="p">,</span> <span class="nx">cancelCtx</span> <span class="o">:=</span> <span class="nx">context</span><span class="p">.</span><span class="nx">WithCancel</span><span class="p">(</span><span class="nx">ctx</span><span class="p">)</span>
+	<span class="nx">ctx</span><span class="p">,</span> <span class="nx">cancelCtx</span> <span class="o">:=</span> <span class="nx">context</span><span class="p">.</span><span class="nf">WithCancel</span><span class="p">(</span><span class="nx">ctx</span><span class="p">)</span>
 	<span class="nx">c</span><span class="p">.</span><span class="nx">cancelCtx</span> <span class="p">=</span> <span class="nx">cancelCtx</span>
-	<span class="k">defer</span> <span class="nx">cancelCtx</span><span class="p">()</span>
+	<span class="k">defer</span> <span class="nf">cancelCtx</span><span class="p">()</span>
 
 	<span class="nx">c</span><span class="p">.</span><span class="nx">r</span> <span class="p">=</span> <span class="o">&amp;</span><span class="nx">connReader</span><span class="p">{</span><span class="nx">conn</span><span class="p">:</span> <span class="nx">c</span><span class="p">}</span>
-	<span class="nx">c</span><span class="p">.</span><span class="nx">bufr</span> <span class="p">=</span> <span class="nx">newBufioReader</span><span class="p">(</span><span class="nx">c</span><span class="p">.</span><span class="nx">r</span><span class="p">)</span>
-	<span class="nx">c</span><span class="p">.</span><span class="nx">bufw</span> <span class="p">=</span> <span class="nx">newBufioWriterSize</span><span class="p">(</span><span class="nx">checkConnErrorWriter</span><span class="p">{</span><span class="nx">c</span><span class="p">},</span> <span class="mi">4</span><span class="o">&lt;&lt;</span><span class="mi">10</span><span class="p">)</span>
+	<span class="nx">c</span><span class="p">.</span><span class="nx">bufr</span> <span class="p">=</span> <span class="nf">newBufioReader</span><span class="p">(</span><span class="nx">c</span><span class="p">.</span><span class="nx">r</span><span class="p">)</span>
+	<span class="nx">c</span><span class="p">.</span><span class="nx">bufw</span> <span class="p">=</span> <span class="nf">newBufioWriterSize</span><span class="p">(</span><span class="nx">checkConnErrorWriter</span><span class="p">{</span><span class="nx">c</span><span class="p">},</span> <span class="mi">4</span><span class="o">&lt;&lt;</span><span class="mi">10</span><span class="p">)</span>
 
 	<span class="k">for</span> <span class="p">{</span>
-		<span class="nx">w</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">c</span><span class="p">.</span><span class="nx">readRequest</span><span class="p">(</span><span class="nx">ctx</span><span class="p">)</span>
+		<span class="nx">w</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">c</span><span class="p">.</span><span class="nf">readRequest</span><span class="p">(</span><span class="nx">ctx</span><span class="p">)</span>
 		<span class="c1">// ...
 </span><span class="c1"></span>
 		<span class="c1">// HTTP cannot have multiple simultaneous active requests.[*]
@@ -280,7 +279,7 @@
 </span><span class="c1"></span>		<span class="c1">// in parallel even if their responses need to be serialized.
 </span><span class="c1"></span>		<span class="c1">// But we&#39;re not going to implement HTTP pipelining because it
 </span><span class="c1"></span>		<span class="c1">// was never deployed in the wild and the answer is HTTP/2.
-</span><span class="c1"></span>		<span class="nx">serverHandler</span><span class="p">{</span><span class="nx">c</span><span class="p">.</span><span class="nx">server</span><span class="p">}.</span><span class="nx">ServeHTTP</span><span class="p">(</span><span class="nx">w</span><span class="p">,</span> <span class="nx">w</span><span class="p">.</span><span class="nx">req</span><span class="p">)</span>
+</span><span class="c1"></span>		<span class="nx">serverHandler</span><span class="p">{</span><span class="nx">c</span><span class="p">.</span><span class="nx">server</span><span class="p">}.</span><span class="nf">ServeHTTP</span><span class="p">(</span><span class="nx">w</span><span class="p">,</span> <span class="nx">w</span><span class="p">.</span><span class="nx">req</span><span class="p">)</span>
 		<span class="c1">// ...
 </span><span class="c1"></span>	<span class="p">}</span>
 <span class="p">}</span></code></pre></div>
@@ -295,7 +294,7 @@
 <p>接着分析是，使用for循环一直从conn中读出请求，然后进行处理。从代码猜的是，看来请求并不是一次都能读取完毕，可能会多次读取。</p>
 
 <p>在这里出现了把我们最初定义的server封装成一个<code>serverHandler</code>的类型，该类型其实就是一个server的Handler或者DefaultServeMux，在serverHandler的<code>ServeHTTP(w, w.req)</code>函数定义如下，</p>
-<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="p">(</span><span class="nx">sh</span> <span class="nx">serverHandler</span><span class="p">)</span> <span class="nx">ServeHTTP</span><span class="p">(</span><span class="nx">rw</span> <span class="nx">ResponseWriter</span><span class="p">,</span> <span class="nx">req</span> <span class="o">*</span><span class="nx">Request</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="p">(</span><span class="nx">sh</span> <span class="nx">serverHandler</span><span class="p">)</span> <span class="nf">ServeHTTP</span><span class="p">(</span><span class="nx">rw</span> <span class="nx">ResponseWriter</span><span class="p">,</span> <span class="nx">req</span> <span class="o">*</span><span class="nx">Request</span><span class="p">)</span> <span class="p">{</span>
 	<span class="nx">handler</span> <span class="o">:=</span> <span class="nx">sh</span><span class="p">.</span><span class="nx">srv</span><span class="p">.</span><span class="nx">Handler</span>
 	<span class="k">if</span> <span class="nx">handler</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
 		<span class="nx">handler</span> <span class="p">=</span> <span class="nx">DefaultServeMux</span>
@@ -303,7 +302,7 @@
 	<span class="k">if</span> <span class="nx">req</span><span class="p">.</span><span class="nx">RequestURI</span> <span class="o">==</span> <span class="s">&#34;*&#34;</span> <span class="o">&amp;&amp;</span> <span class="nx">req</span><span class="p">.</span><span class="nx">Method</span> <span class="o">==</span> <span class="s">&#34;OPTIONS&#34;</span> <span class="p">{</span>
 		<span class="nx">handler</span> <span class="p">=</span> <span class="nx">globalOptionsHandler</span><span class="p">{}</span>
 	<span class="p">}</span>
-	<span class="nx">handler</span><span class="p">.</span><span class="nx">ServeHTTP</span><span class="p">(</span><span class="nx">rw</span><span class="p">,</span> <span class="nx">req</span><span class="p">)</span>
+	<span class="nx">handler</span><span class="p">.</span><span class="nf">ServeHTTP</span><span class="p">(</span><span class="nx">rw</span><span class="p">,</span> <span class="nx">req</span><span class="p">)</span>
 <span class="p">}</span></code></pre></div>
 <p>可以在这里面看到，如果我们最开始的时候，server中的Handler如果是nil的话，就使用默认的DefaultServeMux。</p>
 
@@ -327,10 +326,10 @@
 <p>那么我们继续分析ServeMux.ServeHTTP都是如何做的。</p>
 <div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// ServeHTTP dispatches the request to the handler whose
 </span><span class="c1">// pattern most closely matches the request URL.
-</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">mux</span> <span class="o">*</span><span class="nx">ServeMux</span><span class="p">)</span> <span class="nx">ServeHTTP</span><span class="p">(</span><span class="nx">w</span> <span class="nx">ResponseWriter</span><span class="p">,</span> <span class="nx">r</span> <span class="o">*</span><span class="nx">Request</span><span class="p">)</span> <span class="p">{</span>
+</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">mux</span> <span class="o">*</span><span class="nx">ServeMux</span><span class="p">)</span> <span class="nf">ServeHTTP</span><span class="p">(</span><span class="nx">w</span> <span class="nx">ResponseWriter</span><span class="p">,</span> <span class="nx">r</span> <span class="o">*</span><span class="nx">Request</span><span class="p">)</span> <span class="p">{</span>
 	<span class="c1">// ...
-</span><span class="c1"></span>	<span class="nx">h</span><span class="p">,</span> <span class="nx">_</span> <span class="o">:=</span> <span class="nx">mux</span><span class="p">.</span><span class="nx">Handler</span><span class="p">(</span><span class="nx">r</span><span class="p">)</span>
-	<span class="nx">h</span><span class="p">.</span><span class="nx">ServeHTTP</span><span class="p">(</span><span class="nx">w</span><span class="p">,</span> <span class="nx">r</span><span class="p">)</span>
+</span><span class="c1"></span>	<span class="nx">h</span><span class="p">,</span> <span class="nx">_</span> <span class="o">:=</span> <span class="nx">mux</span><span class="p">.</span><span class="nf">Handler</span><span class="p">(</span><span class="nx">r</span><span class="p">)</span>
+	<span class="nx">h</span><span class="p">.</span><span class="nf">ServeHTTP</span><span class="p">(</span><span class="nx">w</span><span class="p">,</span> <span class="nx">r</span><span class="p">)</span>
 <span class="p">}</span></code></pre></div>
 <p>啊哈，起码从注释中，我们可以看到ServeHTTP是把请求分发给最适配的处理函数。</p>
 
@@ -344,26 +343,26 @@
 <div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// Handler returns the handler to use for the given request,
 </span><span class="c1">// consulting r.Method, r.Host, and r.URL.Path. It always returns
 </span><span class="c1">// a non-nil handler. 
-</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">mux</span> <span class="o">*</span><span class="nx">ServeMux</span><span class="p">)</span> <span class="nx">Handler</span><span class="p">(</span><span class="nx">r</span> <span class="o">*</span><span class="nx">Request</span><span class="p">)</span> <span class="p">(</span><span class="nx">h</span> <span class="nx">Handler</span><span class="p">,</span> <span class="nx">pattern</span> <span class="kt">string</span><span class="p">)</span> <span class="p">{</span>
+</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">mux</span> <span class="o">*</span><span class="nx">ServeMux</span><span class="p">)</span> <span class="nf">Handler</span><span class="p">(</span><span class="nx">r</span> <span class="o">*</span><span class="nx">Request</span><span class="p">)</span> <span class="p">(</span><span class="nx">h</span> <span class="nx">Handler</span><span class="p">,</span> <span class="nx">pattern</span> <span class="kt">string</span><span class="p">)</span> <span class="p">{</span>
 	<span class="c1">// ...
-</span><span class="c1"></span>	<span class="k">return</span> <span class="nx">mux</span><span class="p">.</span><span class="nx">handler</span><span class="p">(</span><span class="nx">host</span><span class="p">,</span> <span class="nx">r</span><span class="p">.</span><span class="nx">URL</span><span class="p">.</span><span class="nx">Path</span><span class="p">)</span>
+</span><span class="c1"></span>	<span class="k">return</span> <span class="nx">mux</span><span class="p">.</span><span class="nf">handler</span><span class="p">(</span><span class="nx">host</span><span class="p">,</span> <span class="nx">r</span><span class="p">.</span><span class="nx">URL</span><span class="p">.</span><span class="nx">Path</span><span class="p">)</span>
 <span class="p">}</span></code></pre></div>
 <p>我们暂时不考虑HTTP CONNECT METHOD，剩下的主要的是<code>mux.handler(host, r.URL.Path)</code>。</p>
 <div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// handler is the main implementation of Handler.
 </span><span class="c1">// The path is known to be in canonical form, except for CONNECT methods.
-</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">mux</span> <span class="o">*</span><span class="nx">ServeMux</span><span class="p">)</span> <span class="nx">handler</span><span class="p">(</span><span class="nx">host</span><span class="p">,</span> <span class="nx">path</span> <span class="kt">string</span><span class="p">)</span> <span class="p">(</span><span class="nx">h</span> <span class="nx">Handler</span><span class="p">,</span> <span class="nx">pattern</span> <span class="kt">string</span><span class="p">)</span> <span class="p">{</span>
-	<span class="nx">mux</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nx">RLock</span><span class="p">()</span>
-	<span class="k">defer</span> <span class="nx">mux</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nx">RUnlock</span><span class="p">()</span>
+</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">mux</span> <span class="o">*</span><span class="nx">ServeMux</span><span class="p">)</span> <span class="nf">handler</span><span class="p">(</span><span class="nx">host</span><span class="p">,</span> <span class="nx">path</span> <span class="kt">string</span><span class="p">)</span> <span class="p">(</span><span class="nx">h</span> <span class="nx">Handler</span><span class="p">,</span> <span class="nx">pattern</span> <span class="kt">string</span><span class="p">)</span> <span class="p">{</span>
+	<span class="nx">mux</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">RLock</span><span class="p">()</span>
+	<span class="k">defer</span> <span class="nx">mux</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nf">RUnlock</span><span class="p">()</span>
 
 	<span class="c1">// Host-specific pattern takes precedence over generic ones
 </span><span class="c1"></span>	<span class="k">if</span> <span class="nx">mux</span><span class="p">.</span><span class="nx">hosts</span> <span class="p">{</span>
-		<span class="nx">h</span><span class="p">,</span> <span class="nx">pattern</span> <span class="p">=</span> <span class="nx">mux</span><span class="p">.</span><span class="nx">match</span><span class="p">(</span><span class="nx">host</span> <span class="o">+</span> <span class="nx">path</span><span class="p">)</span>
+		<span class="nx">h</span><span class="p">,</span> <span class="nx">pattern</span> <span class="p">=</span> <span class="nx">mux</span><span class="p">.</span><span class="nf">match</span><span class="p">(</span><span class="nx">host</span> <span class="o">+</span> <span class="nx">path</span><span class="p">)</span>
 	<span class="p">}</span>
 	<span class="k">if</span> <span class="nx">h</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
-		<span class="nx">h</span><span class="p">,</span> <span class="nx">pattern</span> <span class="p">=</span> <span class="nx">mux</span><span class="p">.</span><span class="nx">match</span><span class="p">(</span><span class="nx">path</span><span class="p">)</span>
+		<span class="nx">h</span><span class="p">,</span> <span class="nx">pattern</span> <span class="p">=</span> <span class="nx">mux</span><span class="p">.</span><span class="nf">match</span><span class="p">(</span><span class="nx">path</span><span class="p">)</span>
 	<span class="p">}</span>
 	<span class="k">if</span> <span class="nx">h</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
-		<span class="nx">h</span><span class="p">,</span> <span class="nx">pattern</span> <span class="p">=</span> <span class="nx">NotFoundHandler</span><span class="p">(),</span> <span class="s">&#34;&#34;</span>
+		<span class="nx">h</span><span class="p">,</span> <span class="nx">pattern</span> <span class="p">=</span> <span class="nf">NotFoundHandler</span><span class="p">(),</span> <span class="s">&#34;&#34;</span>
 	<span class="p">}</span>
 	<span class="k">return</span>
 <span class="p">}</span></code></pre></div>
@@ -377,15 +376,15 @@
 <li><p>如果没有匹配的，那么返回一个特殊的Handler——NotFoundHandler()，该Handler的定义如下，也就是往Response中写入404。</p></li>
 </ol>
 <div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// NotFound replies to the request with an HTTP 404 not found error.
-</span><span class="c1"></span><span class="kd">func</span> <span class="nx">NotFound</span><span class="p">(</span><span class="nx">w</span> <span class="nx">ResponseWriter</span><span class="p">,</span> <span class="nx">r</span> <span class="o">*</span><span class="nx">Request</span><span class="p">)</span> <span class="p">{</span> <span class="nx">Error</span><span class="p">(</span><span class="nx">w</span><span class="p">,</span> <span class="s">&#34;404 page not found&#34;</span><span class="p">,</span> <span class="nx">StatusNotFound</span><span class="p">)</span> <span class="p">}</span>
+</span><span class="c1"></span><span class="kd">func</span> <span class="nf">NotFound</span><span class="p">(</span><span class="nx">w</span> <span class="nx">ResponseWriter</span><span class="p">,</span> <span class="nx">r</span> <span class="o">*</span><span class="nx">Request</span><span class="p">)</span> <span class="p">{</span> <span class="nf">Error</span><span class="p">(</span><span class="nx">w</span><span class="p">,</span> <span class="s">&#34;404 page not found&#34;</span><span class="p">,</span> <span class="nx">StatusNotFound</span><span class="p">)</span> <span class="p">}</span>
 
 <span class="c1">// NotFoundHandler returns a simple request handler
 </span><span class="c1">// that replies to each request with a ``404 page not found&#39;&#39; reply.
-</span><span class="c1"></span><span class="kd">func</span> <span class="nx">NotFoundHandler</span><span class="p">()</span> <span class="nx">Handler</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">HandlerFunc</span><span class="p">(</span><span class="nx">NotFound</span><span class="p">)</span> <span class="p">}</span></code></pre></div>
+</span><span class="c1"></span><span class="kd">func</span> <span class="nf">NotFoundHandler</span><span class="p">()</span> <span class="nx">Handler</span> <span class="p">{</span> <span class="k">return</span> <span class="nf">HandlerFunc</span><span class="p">(</span><span class="nx">NotFound</span><span class="p">)</span> <span class="p">}</span></code></pre></div>
 <p>我们往下分析path匹配的函数，<code>h, pattern = mux.match(path)</code></p>
 <div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// Find a handler on a handler map given a path string.
 </span><span class="c1">// Most-specific (longest) pattern wins.
-</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">mux</span> <span class="o">*</span><span class="nx">ServeMux</span><span class="p">)</span> <span class="nx">match</span><span class="p">(</span><span class="nx">path</span> <span class="kt">string</span><span class="p">)</span> <span class="p">(</span><span class="nx">h</span> <span class="nx">Handler</span><span class="p">,</span> <span class="nx">pattern</span> <span class="kt">string</span><span class="p">)</span> <span class="p">{</span>
+</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">mux</span> <span class="o">*</span><span class="nx">ServeMux</span><span class="p">)</span> <span class="nf">match</span><span class="p">(</span><span class="nx">path</span> <span class="kt">string</span><span class="p">)</span> <span class="p">(</span><span class="nx">h</span> <span class="nx">Handler</span><span class="p">,</span> <span class="nx">pattern</span> <span class="kt">string</span><span class="p">)</span> <span class="p">{</span>
 	<span class="c1">// Check for exact match first.
 </span><span class="c1"></span>	<span class="nx">v</span><span class="p">,</span> <span class="nx">ok</span> <span class="o">:=</span> <span class="nx">mux</span><span class="p">.</span><span class="nx">m</span><span class="p">[</span><span class="nx">path</span><span class="p">]</span>
 	<span class="k">if</span> <span class="nx">ok</span> <span class="p">{</span>
@@ -395,7 +394,7 @@
 	<span class="c1">// Check for longest valid match.
 </span><span class="c1"></span>	<span class="kd">var</span> <span class="nx">n</span> <span class="p">=</span> <span class="mi">0</span>
 	<span class="k">for</span> <span class="nx">k</span><span class="p">,</span> <span class="nx">v</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">mux</span><span class="p">.</span><span class="nx">m</span> <span class="p">{</span>
-		<span class="k">if</span> <span class="p">!</span><span class="nx">pathMatch</span><span class="p">(</span><span class="nx">k</span><span class="p">,</span> <span class="nx">path</span><span class="p">)</span> <span class="p">{</span>
+		<span class="k">if</span> <span class="p">!</span><span class="nf">pathMatch</span><span class="p">(</span><span class="nx">k</span><span class="p">,</span> <span class="nx">path</span><span class="p">)</span> <span class="p">{</span>
 			<span class="k">continue</span>
 		<span class="p">}</span>
 		<span class="k">if</span> <span class="nx">h</span> <span class="o">==</span> <span class="kc">nil</span> <span class="o">||</span> <span class="nb">len</span><span class="p">(</span><span class="nx">k</span><span class="p">)</span> <span class="p">&gt;</span> <span class="nx">n</span> <span class="p">{</span>
@@ -415,10 +414,10 @@
 <p>我们回顾到上面调用处理函数的地方，</p>
 <div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// ServeHTTP dispatches the request to the handler whose
 </span><span class="c1">// pattern most closely matches the request URL.
-</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">mux</span> <span class="o">*</span><span class="nx">ServeMux</span><span class="p">)</span> <span class="nx">ServeHTTP</span><span class="p">(</span><span class="nx">w</span> <span class="nx">ResponseWriter</span><span class="p">,</span> <span class="nx">r</span> <span class="o">*</span><span class="nx">Request</span><span class="p">)</span> <span class="p">{</span>
+</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">mux</span> <span class="o">*</span><span class="nx">ServeMux</span><span class="p">)</span> <span class="nf">ServeHTTP</span><span class="p">(</span><span class="nx">w</span> <span class="nx">ResponseWriter</span><span class="p">,</span> <span class="nx">r</span> <span class="o">*</span><span class="nx">Request</span><span class="p">)</span> <span class="p">{</span>
 	<span class="c1">// ...
-</span><span class="c1"></span>	<span class="nx">h</span><span class="p">,</span> <span class="nx">_</span> <span class="o">:=</span> <span class="nx">mux</span><span class="p">.</span><span class="nx">Handler</span><span class="p">(</span><span class="nx">r</span><span class="p">)</span>
-	<span class="nx">h</span><span class="p">.</span><span class="nx">ServeHTTP</span><span class="p">(</span><span class="nx">w</span><span class="p">,</span> <span class="nx">r</span><span class="p">)</span>
+</span><span class="c1"></span>	<span class="nx">h</span><span class="p">,</span> <span class="nx">_</span> <span class="o">:=</span> <span class="nx">mux</span><span class="p">.</span><span class="nf">Handler</span><span class="p">(</span><span class="nx">r</span><span class="p">)</span>
+	<span class="nx">h</span><span class="p">.</span><span class="nf">ServeHTTP</span><span class="p">(</span><span class="nx">w</span><span class="p">,</span> <span class="nx">r</span><span class="p">)</span>
 <span class="p">}</span></code></pre></div>
 <p>我们从mux中获取到了一个Handler h，我们是使用<code>h.ServeHTTP(w, r)</code>来调用我们定义的请求处理函数。</p>
 
@@ -426,21 +425,21 @@
 
 <p>并且Handler interface的定义也是下面这样，</p>
 <div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">type</span> <span class="nx">Handler</span> <span class="kd">interface</span> <span class="p">{</span>
-	<span class="nx">ServeHTTP</span><span class="p">(</span><span class="nx">ResponseWriter</span><span class="p">,</span> <span class="o">*</span><span class="nx">Request</span><span class="p">)</span>
+	<span class="nf">ServeHTTP</span><span class="p">(</span><span class="nx">ResponseWriter</span><span class="p">,</span> <span class="o">*</span><span class="nx">Request</span><span class="p">)</span>
 <span class="p">}</span></code></pre></div>
 <p>也要求Handler，也即是我们的处理函数需要满足：ServeHTTP(ResponseWriter, *Request)，然而我们的函数并没有定义ServeHTTP函数，这是怎么一回事？</p>
 
 <p>奇妙之处就在于注册的时候，</p>
 
 <p>当我们用<code>http.HandleFunc(&quot;/foo&quot;, fooHandler)</code>注册时，</p>
-<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="nx">HandleFunc</span><span class="p">(</span><span class="nx">pattern</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">handler</span> <span class="kd">func</span><span class="p">(</span><span class="nx">ResponseWriter</span><span class="p">,</span> <span class="o">*</span><span class="nx">Request</span><span class="p">))</span> <span class="p">{</span>
-	<span class="nx">DefaultServeMux</span><span class="p">.</span><span class="nx">HandleFunc</span><span class="p">(</span><span class="nx">pattern</span><span class="p">,</span> <span class="nx">handler</span><span class="p">)</span>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="nf">HandleFunc</span><span class="p">(</span><span class="nx">pattern</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">handler</span> <span class="kd">func</span><span class="p">(</span><span class="nx">ResponseWriter</span><span class="p">,</span> <span class="o">*</span><span class="nx">Request</span><span class="p">))</span> <span class="p">{</span>
+	<span class="nx">DefaultServeMux</span><span class="p">.</span><span class="nf">HandleFunc</span><span class="p">(</span><span class="nx">pattern</span><span class="p">,</span> <span class="nx">handler</span><span class="p">)</span>
 <span class="p">}</span>
 
 <span class="c1">// HandleFunc registers the handler function for the given pattern.
-</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">mux</span> <span class="o">*</span><span class="nx">ServeMux</span><span class="p">)</span> <span class="nx">HandleFunc</span><span class="p">(</span><span class="nx">pattern</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">handler</span> <span class="kd">func</span><span class="p">(</span><span class="nx">ResponseWriter</span><span class="p">,</span> <span class="o">*</span><span class="nx">Request</span><span class="p">))</span> <span class="p">{</span>
+</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">mux</span> <span class="o">*</span><span class="nx">ServeMux</span><span class="p">)</span> <span class="nf">HandleFunc</span><span class="p">(</span><span class="nx">pattern</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">handler</span> <span class="kd">func</span><span class="p">(</span><span class="nx">ResponseWriter</span><span class="p">,</span> <span class="o">*</span><span class="nx">Request</span><span class="p">))</span> <span class="p">{</span>
 	<span class="c1">// ...
-</span><span class="c1"></span>	<span class="nx">mux</span><span class="p">.</span><span class="nx">Handle</span><span class="p">(</span><span class="nx">pattern</span><span class="p">,</span> <span class="nx">HandlerFunc</span><span class="p">(</span><span class="nx">handler</span><span class="p">))</span>
+</span><span class="c1"></span>	<span class="nx">mux</span><span class="p">.</span><span class="nf">Handle</span><span class="p">(</span><span class="nx">pattern</span><span class="p">,</span> <span class="nf">HandlerFunc</span><span class="p">(</span><span class="nx">handler</span><span class="p">))</span>
 <span class="p">}</span></code></pre></div>
 <p>在HandleFunc中，会把我们自定义的handler（也就是fooHandler）强制类型转换为<code>HandlerFunc(handler)</code>。</p>
 
@@ -452,8 +451,8 @@
 </span><span class="c1"></span><span class="kd">type</span> <span class="nx">HandlerFunc</span> <span class="kd">func</span><span class="p">(</span><span class="nx">ResponseWriter</span><span class="p">,</span> <span class="o">*</span><span class="nx">Request</span><span class="p">)</span>
 
 <span class="c1">// ServeHTTP calls f(w, r).
-</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">f</span> <span class="nx">HandlerFunc</span><span class="p">)</span> <span class="nx">ServeHTTP</span><span class="p">(</span><span class="nx">w</span> <span class="nx">ResponseWriter</span><span class="p">,</span> <span class="nx">r</span> <span class="o">*</span><span class="nx">Request</span><span class="p">)</span> <span class="p">{</span>
-	<span class="nx">f</span><span class="p">(</span><span class="nx">w</span><span class="p">,</span> <span class="nx">r</span><span class="p">)</span>
+</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">f</span> <span class="nx">HandlerFunc</span><span class="p">)</span> <span class="nf">ServeHTTP</span><span class="p">(</span><span class="nx">w</span> <span class="nx">ResponseWriter</span><span class="p">,</span> <span class="nx">r</span> <span class="o">*</span><span class="nx">Request</span><span class="p">)</span> <span class="p">{</span>
+	<span class="nf">f</span><span class="p">(</span><span class="nx">w</span><span class="p">,</span> <span class="nx">r</span><span class="p">)</span>
 <span class="p">}</span></code></pre></div>
 <p>HandlerFunc就是为了适配自定义的函数为标准的Handler。</p>
 
